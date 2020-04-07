@@ -17,9 +17,11 @@ export default {
   config: {
     // pages 的首个页面会被编译成首页
     pages: [
+      'pages/billiards/billiards',
       'pages/index/index',
-      'pages/my/my',
-      'pages/vuex/vuex'
+      'pages/mall/mall',
+      'pages/video/video',
+      'pages/my/my'
     ],
     tabBar: {
       color: '#333',
@@ -32,14 +34,26 @@ export default {
           selectedIconPath: 'native/tabbar/home_on.png'
         },
         {
-          pagePath: 'pages/my/my',
-          text: 'my',
+          pagePath: 'pages/billiards/billiards',
+          text: '台球',
+          iconPath: 'native/tabbar/home.png',
+          selectedIconPath: 'native/tabbar/home_on.png'
+        },
+        {
+          pagePath: 'pages/video/video',
+          text: '社区',
           iconPath: 'native/tabbar/mine.png',
           selectedIconPath: 'native/tabbar/mine_on.png'
         },
         {
-          pagePath: 'pages/vuex/vuex',
-          text: 'vuex',
+          pagePath: 'pages/mall/mall',
+          text: '商城',
+          iconPath: 'native/tabbar/home.png',
+          selectedIconPath: 'native/tabbar/home_on.png'
+        },
+        {
+          pagePath: 'pages/my/my',
+          text: '我的',
           iconPath: 'native/tabbar/vue.png',
           selectedIconPath: 'native/tabbar/vue_on.png'
         }
