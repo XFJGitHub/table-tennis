@@ -2,3 +2,20 @@
 @import './icon.scss';
 @import './index.scss';
 @import './color.scss';
+
+.t-button {
+    background: white;
+    padding: 16px 40px;
+    border-radius: 10px;
+    font-size: 28rpx;
+}
+
+.t-button-primary {
+    background: #3399FF;
+    color: white;
+}
+
+.t-button-primary {
+    background: #00CC66;
+    color: white;
+}
