@@ -18,8 +18,8 @@
               <div class="table-title mt_20">￥{{item.price}}</div>
             </div>
             <div class="flex">
-              <button class="t-button mr_20">预约</button>
-              <button class="t-button t-button-primary">开台</button>
+              <button class="t-button mr_20" @click="toAppointment(item.id)">预约</button>
+              <button class="t-button t-button-success">开台</button>
             </div>
           </div>
         </div>
@@ -37,7 +37,8 @@
       </div>
     </div>
 
-    <button class="close-button">结账</button>
+    <button @click="settleAccount" class="close-button">结账</button>
+
   </div>
 </template>
 
@@ -47,6 +48,7 @@ export default {
     return {
       tableList: [
         {
+          id: 0,
           name: '星牌-1',
           price: '30'
         },
@@ -65,6 +67,20 @@ export default {
       ],
       startTime: '14:22',
       endTime: '15:22'
+    }
+  },
+  methods: {
+    toAppointment (id) {
+      wx.navigateTo({
+        url: `/pages/billiards/appointment?tableId=${id}`
+      })
+    },
+    settleAccount () {
+      wx.showToast({
+        title: `您消费时间共1小时，消费金额${this.endTime}`,
+        icon: 'none',
+        duration: 5000
+      })
     }
   }
 }

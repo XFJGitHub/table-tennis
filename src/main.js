@@ -20,10 +20,14 @@ export default {
   config: {
     // pages 的首个页面会被编译成首页
     pages: [
-      'pages/billiards/billiards',
       'pages/index/index',
-      'pages/mall/mall',
+      'pages/billiards/billiards',
+      'pages/billiards/appointment',
       'pages/video/video',
+      'pages/video/articleDetail',
+      'pages/mall/mall',
+      'pages/mall/goodsDetail',
+      'pages/mall/orderList',
       'pages/my/my'
     ],
     tabBar: {

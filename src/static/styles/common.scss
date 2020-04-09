@@ -15,7 +15,31 @@
     color: white;
 }
 
-.t-button-primary {
+.t-button-success {
     background: #00CC66;
     color: white;
+}
+
+//tabs标签页
+.tabs_wrap {
+    background: white;
+    border-bottom: 1px solid #e5e5e5;
+    display: flex;
+    justify-content: space-around;
+    .tabs {
+        line-height: 80rpx;
+        width: 150rpx;
+        text-align: center;
+    }
+    .tabs_active {
+      color: #3091f2;
+      padding: 0rpx;
+      border-bottom: 1px solid #3091f2;
+    }
+  }
+
+.text-ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
