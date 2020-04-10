@@ -29,7 +29,7 @@
         </div>
       </div>
       <div class="right-content">
-        <div class="flex ml_20 mt_10" v-for="(ite, ind) in goodsList" :key="ite.id+ind">
+        <div class="flex ml_20 mt_10" v-for="(ite, ind) in goodsList" :key="ite.id">
           <div style="width: 200rpx;height:200rpx">
             <img style="width:100%;height:100%;border-radius:20rpx" :src="ite.url">
           </div>
@@ -128,15 +128,17 @@ export default {
 
 .left-sidebar {
   width: 200rpx;
-  background: #2494E8;
+  // background: #2494E8;
+  background: #bce4e6;
   text-align: left;
   .sidebar-name {
     font-size: 28rpx;
     color: white;
-    margin: 0 10rpx;
+    margin: 0 20rpx;
     padding: 20rpx 0rpx 20rpx 40rpx;
     &:not(last-child) {
-      border-bottom: 1px solid #e5e5e5;
+      // border-bottom: 1px solid #e5e5e5;
+      border-bottom: 1px solid #fff;
     }
   }
 }

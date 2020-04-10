@@ -43,26 +43,26 @@ export default {
         {
           pagePath: 'pages/billiards/billiards',
           text: '台球',
-          iconPath: 'native/tabbar/home.png',
-          selectedIconPath: 'native/tabbar/home_on.png'
+          iconPath: 'native/tabbar/taiqiu.png',
+          selectedIconPath: 'native/tabbar/taiqiu_on.png'
         },
         {
           pagePath: 'pages/video/video',
           text: '社区',
-          iconPath: 'native/tabbar/mine.png',
-          selectedIconPath: 'native/tabbar/mine_on.png'
+          iconPath: 'native/tabbar/video.png',
+          selectedIconPath: 'native/tabbar/video_on.png'
         },
         {
           pagePath: 'pages/mall/mall',
           text: '商城',
-          iconPath: 'native/tabbar/home.png',
-          selectedIconPath: 'native/tabbar/home_on.png'
+          iconPath: 'native/tabbar/shopping.png',
+          selectedIconPath: 'native/tabbar/shopping_on.png'
         },
         {
           pagePath: 'pages/my/my',
           text: '我的',
-          iconPath: 'native/tabbar/vue.png',
-          selectedIconPath: 'native/tabbar/vue_on.png'
+          iconPath: 'native/tabbar/mine.png',
+          selectedIconPath: 'native/tabbar/mine_on.png'
         }
       ]
     },
