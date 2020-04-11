@@ -28,7 +28,9 @@ export default {
       'pages/mall/mall',
       'pages/mall/goodsDetail',
       'pages/mall/orderList',
-      'pages/my/my'
+      'pages/my/my',
+      'pages/my/advice',
+      'pages/my/setting'
     ],
     tabBar: {
       color: '#333',

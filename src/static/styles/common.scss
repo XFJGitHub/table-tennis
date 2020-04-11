@@ -20,6 +20,15 @@
     color: white;
 }
 
+.button-noclass {
+    font-weight: bold;
+    background: none;
+    padding: 0;
+    &::after {
+        border: none;
+    }
+}
+
 //tabs标签页
 .tabs_wrap {
     background: white;
@@ -42,4 +51,9 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+//red *
+.red_star {
+    color: red
 }

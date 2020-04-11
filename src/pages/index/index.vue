@@ -105,11 +105,17 @@ export default {
         0: '/pages/billiards/billiards',
         1: '/pages/video/video',
         2: '/pages/mall/mall',
-        3: ''
+        3: '/pages/my/advice'
       }
-      wx.switchTab({
-        url: url[num]
-      })
+      if (num === 3) {
+        wx.navigateTo({
+          url: url[num]
+        })
+      } else {
+        wx.switchTab({
+          url: url[num]
+        })
+      }
     },
     toGoodsDetails (val) {
       wx.navigateTo({
