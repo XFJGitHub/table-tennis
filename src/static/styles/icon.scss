@@ -58,6 +58,35 @@
     height: 40rpx;
 }
 
+//减号
+.icon_jianhao{
+    display: block;
+    background-image: url('https://static.dingdandao.com/6fc6f75614c8700a7d7a57173ee2ed62');
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 50rpx;
+    height: 50rpx;
+}
+//加号
+.icon_jiahao{
+    display: block;
+    background-image: url('https://static.dingdandao.com/b5ac15cc078db8ad358496a668c990f8');
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 50rpx;
+    height: 50rpx;
+}
+
+//购物车
+.icon_shoppingCar {
+    display: block;
+    background-image: url('https://static.dingdandao.com/c140c728f8e308f2e25979bebefd2ecd');
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 80rpx;
+    height: 80rpx;
+}
+
 //余额
 .icon_money {
     display: block;

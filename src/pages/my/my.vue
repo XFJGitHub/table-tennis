@@ -8,20 +8,17 @@
   <div class="my_wrap">
     <div class="my-head flex">
       <div style="width: 130rpx;height:130rpx">
-        <img v-if="userPhoto" style="width:100%;height:100%;border-radius: 30rpx;" :src="userPhoto">
-        <img v-else style="width:100%;height:100%;border-radius: 30rpx;" src="https://static.dingdandao.com//ueditor/upload/image/20190822/1566461822343050529.png">
+        <!-- <img v-if="avatarUrl" style="width:100%;height:100%;border-radius: 30rpx;" :src="avatarUrl">
+        <img v-else style="width:100%;height:100%;border-radius: 30rpx;" src="https://static.dingdandao.com//ueditor/upload/image/20190822/1566461822343050529.png"> -->
+        <img style="width:100%;height:100%;border-radius: 30rpx;" :src="avatarUrl ? avatarUrl : 'https://static.dingdandao.com//ueditor/upload/image/20190822/1566461822343050529.png'">
       </div>
       <div class="ml_40">
-        <div v-if="!phone">
-          <button class="button-noclass" open-type="getPhoneNumber" @getPhoneNumber="getPhone">点击登录</button>
-          <div class="mt_30 fontsize_30 color_156">游客</div>
-        </div>
-        <div v-else-if="!userName">
-          <button class="button-noclass" open-type="getUserInfo" @getUserInfo="getUserInfo">点击获取名字头像</button>
+        <div v-if="!nickName">
+          <button hover-class="none" class="button-noclass" open-type="getUserInfo" lang="zh_CN" @getuserinfo="getUserInfo">点击显示微信头像</button>
           <div class="mt_30 fontsize_30 color_156">游客</div>
         </div>
         <div v-else>
-          <div class="font_bold">{{userName}}</div>
+          <div class="font_bold">{{nickName}}</div>
           <div class="mt_30 color_464">普通用户</div>
         </div>
       </div>
@@ -77,7 +74,7 @@
           <i class="icon_open m_20" />
           <div class="icon-text-wrap" style="border:none">
             <div class="icon-text">暂停营业</div>
-              <switch :checked="businessStatus" color="red" @change="changeBussinessStatus" style="zoom: .8"/>
+              <switch :checked="stopBusinessStatus" color="red" @change="changeBussinessStatus" style="zoom: .8"/>
           </div>
         </div>
       </div>
@@ -89,33 +86,19 @@
 export default {
   data () {
     return {
-      phone: 1 || Megalo.getStorageSync('phone'),
-      userPhoto: Megalo.getStorageSync('userPhoto'),
-      userName: Megalo.getStorageSync('userName'),
+      avatarUrl: Megalo.getStorageSync('avatarUrl'),
+      nickName: Megalo.getStorageSync('nickName'),
       money: 0,
-      businessStatus: false
+      stopBusinessStatus: false
     }
   },
   methods: {
-    // 获取手机号
-    getPhone (e) {
-      console.log(e)
-    },
     // 获取用户信息
-    getUserInfo () {
-      console.log(1223)
-      wx.getUserInfo({
-        success: (res) => {
-          this.userName = res.userInfo.nickName
-          this.userPhoto = res.userInfo.avatarUrl
-          console.log(1)
-          console.log(res)
-        },
-        fail: (err) => {
-          console.log('fail')
-          console.log(err)
-        }
-      })
+    getUserInfo (e) {
+      this.nickName = e.detail.userInfo.nickName
+      this.avatarUrl = e.detail.userInfo.avatarUrl
+      Megalo.setStorageSync('nickName', e.detail.userInfo.nickName)
+      Megalo.setStorageSync('avatarUrl', e.detail.userInfo.avatarUrl)
     },
     // 投诉与建议
     toAdvice () {

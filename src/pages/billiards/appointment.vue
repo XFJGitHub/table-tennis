@@ -8,7 +8,6 @@
       <div class="color_464 fontsize_24">请在下方选择您方便的时间，届时请准时到达，谢谢合作</div>
       <div class="color_464 fontsize_24">本店营业时间为9am-10pm</div>
       <div class="color_464 fontsize_24">请注意只能预约今明两天</div>
-      
       <picker
         class="mt_20 ml_40 border_bottom"
         mode="date"

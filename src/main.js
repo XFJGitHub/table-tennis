@@ -16,6 +16,11 @@ const app = new Vue(App)
 
 app.$mount()
 
+wx.cloud.init({
+  env: 'table-waxhn',
+  traceUser: true
+})
+
 export default {
   config: {
     // pages 的首个页面会被编译成首页

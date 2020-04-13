@@ -28,19 +28,24 @@
           {{item.name}}
         </div>
       </div>
-      <div class="right-content">
-        <div class="flex ml_20 mt_10" v-for="(ite) in goodsList" :key="ite.id">
-          <div style="width: 200rpx;height:200rpx">
-            <img style="width:100%;height:100%;border-radius:20rpx" :src="ite.url">
-          </div>
-          <div class="goods_wrap">
-            <div style="width: 300rpx;" class="text-ellipsis">{{ite.title}}</div>
-            <div v-if="ite.tags !== 0" class="goods-tags">包邮</div>
-            <div class="goods-price">
-              ￥<span class="fontsize_40">{{ite.price}}</span>.00
+      <div class="right-content relative">
+        <movable-area class="w_100 h_100" style="pointer-events: none">
+          <div class="flex ml_20 mt_10" v-for="(ite) in goodsList" :key="ite.id">
+            <div style="width: 200rpx;height:200rpx">
+              <img style="width:100%;height:100%;border-radius:20rpx" :src="ite.url">
+            </div>
+            <div class="goods_wrap">
+              <div style="width: 300rpx;" class="text-ellipsis">{{ite.title}}</div>
+              <div v-if="ite.tags !== 0" class="goods-tags">包邮</div>
+              <div class="goods-price">
+                ￥<span class="fontsize_40">{{ite.price}}</span>.00
+              </div>
             </div>
           </div>
-        </div>
+          <movable-view direction="all" style="pointer-events: auto" :x="x" :y="y">
+            <i class="icon_shoppingCar" />
+          </movable-view>
+        </movable-area>
       </div>
     </div>
   </div>
@@ -50,6 +55,8 @@
 export default {
   data () {
     return {
+      x: 200,
+      y: 350,
       keyword: '',
       advertingUrl: 'https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=2292788998,2636499574&fm=26&gp=0.jpg',
       routerList: [
