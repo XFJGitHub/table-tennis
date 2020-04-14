@@ -6,19 +6,19 @@
 <template>
   <div>
     <div class="tabs_wrap">
-      <div class="tabs" @click="activeTab = 0" :class="{ 'tabs_active' : activeTab === 0}">全部</div>
-      <div class="tabs" @click="activeTab = 1" :class="{ 'tabs_active' : activeTab === 1}">待完成</div>
+      <div class="tabs" @click="changeTab(0)" :class="{ 'tabs_active' : activeTab === 0}">全部</div>
+      <div class="tabs" @click="changeTab(1)" :class="{ 'tabs_active' : activeTab === 1}">待完成</div>
     </div>
 
-    <div>
+    <div v-if="dataList.length > 0">
       <div class="order_wrap_shadow" v-for="(item, index) in dataList" :key="item.id+index">
         <div class="order_wrap">
           <div class="justify_between align_center order-status">
-            <div class="order-time">订单编号:{{item.num}}</div>
+            <div class="order-time">订单编号:{{item.orderId}}</div>
             <div :style="{ color: item.orderStatus === '已完成' ? '#00e500' : '#c32136' }" class="justify_end">{{item.orderStatus}}</div>
           </div>
-          <div class="justify_between my_20">
-            <div class="order-name">{{item.goods}}</div>
+          <div class="justify_between align_center my_20">
+            <div class="order-name text-ellipsis" style="width:360rpx">{{item.name}}</div>
             <div class="order-time">{{item.time}}</div>
           </div>
           <div class="justify_between align_center mt_40">
@@ -27,6 +27,10 @@
           </div>
         </div>
       </div>
+    </div>
+    <div class="align_center flex_column" v-else>
+      <img style="margin-top: 200rpx;width: 280rpx;height:200rpx" src="https://static.dingdandao.com/612007ba2dc43b5c6646f19fe54a4206">
+      <div style="color: #a3b1bf" class="mt_20 fontsize_26">暂无数据</div>
     </div>
   </div>
 </template>
@@ -37,22 +41,41 @@ export default {
     return {
       activeTab: 0,
       dataList: [
-        {
-          num: 331022333,
-          orderStatus: '已完成',
-          goods: '金丝台球',
-          time: '2020-04-11',
-          price: 125
-        },
-        {
-          num: 331023344,
-          orderStatus: '待付款',
-          goods: '金丝台球',
-          time: '2020-04-11',
-          price: 125
-        }
+        // {
+        //   num: 331022333,
+        //   orderStatus: '已完成',
+        //   goods: '金丝台球',
+        //   time: '2020-04-11',
+        //   price: 125
+        // },
+        // {
+        //   num: 331023344,
+        //   orderStatus: '待付款',
+        //   goods: '金丝台球',
+        //   time: '2020-04-11',
+        //   price: 125
+        // }
       ]
     }
+  },
+  methods: {
+    getData () {
+      this.$db.collection('orderList').where({
+        orderType: this.activeTab
+      }).get({
+        success: res => {
+          console.log(res)
+          this.dataList = res.data
+        }
+      })
+    },
+    changeTab (type) {
+      this.activeTab = type
+      this.getData()
+    }
+  },
+  onLoad () {
+    this.getData()
   }
 }
 </script>

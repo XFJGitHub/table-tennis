@@ -20,6 +20,7 @@ wx.cloud.init({
   env: 'table-waxhn',
   traceUser: true
 })
+Vue.prototype.$db = wx.cloud.database()
 
 export default {
   config: {

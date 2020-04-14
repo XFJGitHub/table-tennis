@@ -35,6 +35,14 @@
           </div>
         </div>
       </div>
+      <div class="flex align_center" @click="toOrderList">
+        <i class="icon_order m_20" />
+        <div class="icon-text-wrap">
+          <div class="icon-text">订单列表</div>
+          <i class="icon_right" />
+        </div>
+      </div>
+
       <div class="flex align_center" @click="toBilliards">
         <i class="icon_time m_20" />
         <div class="icon-text-wrap">
@@ -92,6 +100,14 @@ export default {
       stopBusinessStatus: false
     }
   },
+  onLoad () {
+    wx.cloud.callFunction({
+      name: 'demo',
+      complete: res => {
+        Megalo.setStorageSync('openid', res.result.openid)
+      }
+    })
+  },
   methods: {
     // 获取用户信息
     getUserInfo (e) {
@@ -99,11 +115,33 @@ export default {
       this.avatarUrl = e.detail.userInfo.avatarUrl
       Megalo.setStorageSync('nickName', e.detail.userInfo.nickName)
       Megalo.setStorageSync('avatarUrl', e.detail.userInfo.avatarUrl)
+      this.$db.collection('userInfo').get({
+        success: res => {
+          res.data.map(e => {
+            if (e._openid !== Megalo.getStorageSync('openid')) {
+              this.$db.collection('userInfo').add({
+                data: {
+                  nickName: this.nickName,
+                  avatarUrl: this.avatarUrl,
+                  balance: 0,
+                  isSeller: false
+                }
+              })
+            }
+          })
+        }
+      })
     },
     // 投诉与建议
     toAdvice () {
       wx.navigateTo({
         url: '/pages/my/advice'
+      })
+    },
+    // 订单列表
+    toOrderList () {
+      wx.navigateTo({
+        url: '/pages/mall/orderList'
       })
     },
     // 预约球桌

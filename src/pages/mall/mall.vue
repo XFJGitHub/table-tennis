@@ -4,45 +4,58 @@
   }
 </config>
 <template>
-  <div>
-    <div class="mall-head_wrap">
-      <div class="search_wrap">
-        <input
-        v-model="keyword"
-        style="width: 100%;"
-        type="text"
-        placeholder="请输入相关商品"
-        confirm-type="search"
-        >
-        <i class="icon_search"></i>
-      </div>
+  <div class="flex_column h_100">
+    <div>
+      <!-- <div class="mall-head_wrap">
+        <div class="search_wrap">
+          <input
+          v-model="keyword"
+          style="width: 100%;"
+          type="text"
+          placeholder="请输入查询的商品名称"
+          confirm-type="search"
+          >
+          <i class="icon_search" @click="search"></i>
+        </div>
+      </div> -->
+
+      <!-- <div style="width: 100%;height: 280rpx;">
+        <img :src="advertingUrl" style="width:100%;height:100%">
+      </div> -->
     </div>
 
-    <div style="width: 100%;height: 140rpx;">
-      <img :src="advertingUrl" style="width:100%;height:100%">
-    </div>
-
-    <div class="flex">
+    <div class="flex flex-grow">
       <div class="left-sidebar">
-        <div class="sidebar-name" v-for="(item, index) in routerList" :key="index">
+        <div
+          class="sidebar-name"
+          v-for="(item, index) in routerList"
+          :key="index"
+          @click="changeRouter(item, index)"
+          :class="active === index ? 'router_active' : ''"
+        >
           {{item.name}}
         </div>
       </div>
       <div class="right-content relative">
-        <movable-area class="w_100 h_100" style="pointer-events: none">
-          <div class="flex ml_20 mt_10" v-for="(ite) in goodsList" :key="ite.id">
+        <movable-area class="w_100 h_100">
+          <div
+            class="flex ml_20 mb_20"
+            v-for="(ite) in goodsList"
+            :key="ite.id"
+            @click="toGoodsDetail(ite)"
+          >
             <div style="width: 200rpx;height:200rpx">
-              <img style="width:100%;height:100%;border-radius:20rpx" :src="ite.url">
+              <img style="width:100%;height:100%;border-radius:20rpx" :src="ite.goodsDetail.url[0]">
             </div>
             <div class="goods_wrap">
-              <div style="width: 300rpx;" class="text-ellipsis">{{ite.title}}</div>
-              <div v-if="ite.tags !== 0" class="goods-tags">包邮</div>
+              <div style="width: 300rpx;" class="text-ellipsis">{{ite.goodsDetail.name}}</div>
+              <div v-if="ite.goodsDetail.tags !== 0" class="goods-tags">包邮</div>
               <div class="goods-price">
-                ￥<span class="fontsize_40">{{ite.price}}</span>.00
+                ￥<span class="fontsize_40">{{ite.goodsDetail.price}}</span>.00
               </div>
             </div>
           </div>
-          <movable-view direction="all" style="pointer-events: auto" :x="x" :y="y">
+          <movable-view direction="all" :x="x" :y="y">
             <i class="icon_shoppingCar" />
           </movable-view>
         </movable-area>
@@ -58,67 +71,69 @@ export default {
       x: 200,
       y: 350,
       keyword: '',
-      advertingUrl: 'https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=2292788998,2636499574&fm=26&gp=0.jpg',
-      routerList: [
-        {
-          id: 0,
-          name: '台球'
-        },
-        {
-          id: 1,
-          name: '台球杆'
-        }
-      ],
-      goodsList: [
-        {
-          id: 0,
-          url: 'http://img2.imgtn.bdimg.com/it/u=4288298065,3108720683&fm=26&gp=0.jpg',
-          title: '金丝台球杆阿斯顿ad撒旦是ad撒旦撒打算多少打算打',
-          tags: 1,
-          price: 123
-        },
-        {
-          id: 0,
-          url: 'http://img2.imgtn.bdimg.com/it/u=4288298065,3108720683&fm=26&gp=0.jpg',
-          title: '金丝台球杆阿斯顿ad撒旦是ad撒旦撒打算多少打算打',
-          tags: 1,
-          price: 123
-        },
-        {
-          id: 0,
-          url: 'http://img2.imgtn.bdimg.com/it/u=4288298065,3108720683&fm=26&gp=0.jpg',
-          title: '金丝台球杆阿斯顿ad撒旦是ad撒旦撒打算多少打算打',
-          tags: 1,
-          price: 123
-        },
-        {
-          id: 0,
-          url: 'http://img2.imgtn.bdimg.com/it/u=4288298065,3108720683&fm=26&gp=0.jpg',
-          title: '金丝台球杆阿斯顿ad撒旦是ad撒旦撒打算多少打算打',
-          tags: 1,
-          price: 123
-        },
-        {
-          id: 0,
-          url: 'http://img2.imgtn.bdimg.com/it/u=4288298065,3108720683&fm=26&gp=0.jpg',
-          title: '金丝台球杆阿斯顿ad撒旦是ad撒旦撒打算多少打算打',
-          tags: 1,
-          price: 123
-        },
-        {
-          id: 0,
-          url: 'http://img2.imgtn.bdimg.com/it/u=4288298065,3108720683&fm=26&gp=0.jpg',
-          title: '金丝台球杆阿斯顿ad撒旦是ad撒旦撒打算多少打算打',
-          tags: 1,
-          price: 123
-        }
-      ]
+      active: 0,
+      currentRouter: '台球杆',
+      advertingUrl: '',
+      routerList: [],
+      goodsList: []
     }
+  },
+  methods: {
+    getData () {
+      const db = wx.cloud.database()
+      db.collection('goods').where({
+        goodsType: this.currentRouter
+      }).get({
+        success: res => {
+          this.goodsList = res.data
+        }
+      })
+      // db.collection('mall').get({
+      //   success: res => {
+      //     this.advertingUrl = res.data[0].advertingUrl
+      //   }
+      // })
+    },
+    getRouterList () {
+      this.$db.collection('routerList').get({
+        success: res => {
+          this.routerList = res.data
+        }
+      })
+    },
+    changeRouter (item, ind) {
+      this.currentRouter = item.name
+      this.active = ind
+      this.getData()
+    },
+    toGoodsDetail (val) {
+      console.log(1)
+      wx.navigateTo({
+        url: `/pages/mall/goodsDetail?goodsId=${val._id}`
+      })
+    }
+    // search () {
+    //   this.$db.collection('goods').where({
+    //     'goodsDetail.name': this.keyword
+    //   }).get({
+    //     success: res => {
+    //       this.goodsList = res.data
+    //       this.active = undefined
+    //     }
+    //   })
+    // }
+  },
+  onLoad () {
+    this.getData()
+    this.getRouterList()
   }
 }
 </script>
 
 <style lang='scss'>
+page {
+  height: 100%;
+}
 .mall-head_wrap {
   background: #e8e8e8;
   padding: 15rpx;
@@ -132,21 +147,25 @@ export default {
     border: 1px solid #e5e5e5;
   }
 }
-
 .left-sidebar {
   width: 200rpx;
   // background: #2494E8;
-  background: #bce4e6;
+  // background: #bce4e6;
+  background: #161719;
   text-align: left;
   .sidebar-name {
     font-size: 28rpx;
     color: white;
-    margin: 0 20rpx;
-    padding: 20rpx 0rpx 20rpx 40rpx;
-    border-bottom: 1px solid #fff;
+    // margin: 0 20rpx;
+    padding: 20rpx 0rpx 20rpx 50rpx;
+    // border-bottom: 1px solid #fff;
     // &:not(:last-child) {
       // border-bottom: 1px solid #e5e5e5;
     // }
+  }
+  .router_active {
+    // color: #74b283
+    background: #fe5713
   }
 }
 .right-content {

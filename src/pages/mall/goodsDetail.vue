@@ -30,8 +30,8 @@
         共计金额<span class="color_ff4">￥{{totalMoney}}</span>
       </div>
       <div class="flex">
-        <div class="button left-button">加入购物车</div>
-        <div class="button right-button">立即购买</div>
+        <div @click="joinShoppingCar" class="button left-button">加入购物车</div>
+        <div @click="buy" class="button right-button">立即购买</div>
       </div>
     </div>
   </div>
@@ -42,7 +42,7 @@ export default {
   data () {
     return {
       dataList: {},
-      goodsNum: 0
+      goodsNum: 1
     }
   },
   computed: {
@@ -70,6 +70,18 @@ export default {
       if (this.goodsNum <= 999) {
         this.goodsNum++
       }
+    },
+    joinShoppingCar () {
+
+    },
+    buy () {
+      wx.showModal({
+        content: `需要支付总金额为￥${this.totalMoney}`,
+        success: res => {
+          if (res.confirm) {
+          }
+        }
+      })
     }
   },
   onLoad (options) {
