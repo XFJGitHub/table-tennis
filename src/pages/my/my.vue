@@ -25,6 +25,15 @@
     </div>
 
     <div class="my-body">
+      <div class="flex align_center" @click="toRecharge">
+        <i class="icon_setting m_20" />
+        <div class="icon-text-wrap" style="border:none">
+          <div class="icon-text">充值中心</div>
+          <i class="icon_right" />
+        </div>
+      </div>
+    </div>
+    <div class="my-body">
       <div class="flex align_center">
         <i class="icon_money m_20" />
         <div class="icon-text-wrap">
@@ -96,7 +105,7 @@ export default {
     return {
       avatarUrl: Megalo.getStorageSync('avatarUrl'),
       nickName: Megalo.getStorageSync('nickName'),
-      balance: 0,
+      balance: '',
       isSeller: false,
       stopBusinessStatus: false
     }
@@ -108,6 +117,8 @@ export default {
         Megalo.setStorageSync('openid', res.result.openid)
       }
     })
+  },
+  onShow () {
     this.getData()
   },
   methods: {
@@ -149,6 +160,12 @@ export default {
             })
           }
         }
+      })
+    },
+    // 投诉与建议
+    toRecharge () {
+      wx.navigateTo({
+        url: '/pages/my/recharge'
       })
     },
     // 投诉与建议

@@ -45,10 +45,16 @@ export default {
   },
   methods: {
     getData () {
+      const params = this.activeTab === 0 ? {
+        _openid: Megalo.getStorageSync('openid')
+      } : {
+        _openid: Megalo.getStorageSync('openid'),
+        orderType: 1
+      }
       this.$db.collection('orderList').aggregate().sort({
         time: -1
       }).match({
-        orderType: this.activeTab
+        ...params
       }).end({
         success: res => {
           this.dataList = res.list

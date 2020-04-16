@@ -36,6 +36,7 @@ export default {
       'pages/mall/orderList',
       'pages/my/my',
       'pages/my/advice',
+      'pages/my/recharge',
       'pages/my/setting'
     ],
     tabBar: {
