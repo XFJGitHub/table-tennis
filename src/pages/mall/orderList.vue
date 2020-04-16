@@ -11,7 +11,7 @@
     </div>
 
     <div v-if="dataList.length > 0">
-      <div class="order_wrap_shadow" v-for="(item, index) in dataList" :key="item.id+index">
+      <div class="order_wrap_shadow" v-for="(item, index) in dataList" :key="index">
         <div class="order_wrap">
           <div class="justify_between align_center order-status">
             <div class="order-time">订单编号:{{item.orderId}}</div>
@@ -19,7 +19,7 @@
           </div>
           <div class="justify_between align_center my_20">
             <div class="order-name text-ellipsis" style="width:360rpx">{{item.name}}</div>
-            <div class="order-time">{{item.time}}</div>
+            <div class="order-time">{{item.time.slice(0,10)}}</div>
           </div>
           <div class="justify_between align_center mt_40">
             <div class="order-price">￥{{item.price}}</div>
@@ -40,32 +40,18 @@ export default {
   data () {
     return {
       activeTab: 0,
-      dataList: [
-        // {
-        //   num: 331022333,
-        //   orderStatus: '已完成',
-        //   goods: '金丝台球',
-        //   time: '2020-04-11',
-        //   price: 125
-        // },
-        // {
-        //   num: 331023344,
-        //   orderStatus: '待付款',
-        //   goods: '金丝台球',
-        //   time: '2020-04-11',
-        //   price: 125
-        // }
-      ]
+      dataList: []
     }
   },
   methods: {
     getData () {
-      this.$db.collection('orderList').where({
+      this.$db.collection('orderList').aggregate().sort({
+        time: -1
+      }).match({
         orderType: this.activeTab
-      }).get({
+      }).end({
         success: res => {
-          console.log(res)
-          this.dataList = res.data
+          this.dataList = res.list
         }
       })
     },

@@ -30,7 +30,7 @@
         <div class="icon-text-wrap">
           <div class="icon-text">余额</div>
           <div class="flex align_center">
-            <div class="color_156">{{money}}.00元</div>
+            <div class="color_156">{{balance}}.00元</div>
             <!-- <i class="icon_right ml_10" /> -->
           </div>
         </div>
@@ -96,7 +96,8 @@ export default {
     return {
       avatarUrl: Megalo.getStorageSync('avatarUrl'),
       nickName: Megalo.getStorageSync('nickName'),
-      money: 0,
+      balance: 0,
+      isSeller: false,
       stopBusinessStatus: false
     }
   },
@@ -107,28 +108,46 @@ export default {
         Megalo.setStorageSync('openid', res.result.openid)
       }
     })
+    this.getData()
   },
   methods: {
+    getData () {
+      if (this.nickName) {
+        this.$db.collection('userInfo').where({
+          _openid: Megalo.getStorageSync('openid')
+        }).get({
+          success: res => {
+            this.balance = res.data[0].balance
+            Megalo.setStorageSync('balance', res.data[0].balance)
+            this.isSeller = res.data[0].isSeller
+          }
+        })
+      }
+    },
     // 获取用户信息
     getUserInfo (e) {
       this.nickName = e.detail.userInfo.nickName
       this.avatarUrl = e.detail.userInfo.avatarUrl
       Megalo.setStorageSync('nickName', e.detail.userInfo.nickName)
       Megalo.setStorageSync('avatarUrl', e.detail.userInfo.avatarUrl)
+      var userExist = false
       this.$db.collection('userInfo').get({
         success: res => {
           res.data.map(e => {
-            if (e._openid !== Megalo.getStorageSync('openid')) {
-              this.$db.collection('userInfo').add({
-                data: {
-                  nickName: this.nickName,
-                  avatarUrl: this.avatarUrl,
-                  balance: 0,
-                  isSeller: false
-                }
-              })
+            if (e._openid === Megalo.getStorageSync('openid')) {
+              userExist = true
             }
           })
+          if (userExist === false) {
+            this.$db.collection('userInfo').add({
+              data: {
+                nickName: this.nickName,
+                avatarUrl: this.avatarUrl,
+                balance: 0,
+                isSeller: false
+              }
+            })
+          }
         }
       })
     },

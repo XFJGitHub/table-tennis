@@ -78,7 +78,59 @@ export default {
       wx.showModal({
         content: `需要支付总金额为￥${this.totalMoney}`,
         success: res => {
+          const date = new Date()
+          const year = date.getFullYear()
+          const month = date.getMonth() + 1 < 10 ? '0' + date.getMonth() + 1 : date.getMonth() + 1
+          const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
+          const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
+          const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+          const ss = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
           if (res.confirm) {
+            // 生成订单
+            this.$db.collection('orderList').add({
+              data: {
+                name: this.dataList.name,
+                orderId: `2020${Math.ceil(Math.random() * 10000)}`,
+                orderStatus: '已完成',
+                orderType: 0,
+                price: this.totalMoney,
+                time: `${year}-${month}-${day} ${hour}:${minutes}:${ss}`
+              },
+              success: res => {
+                // 付钱
+                this.$db.collection('userInfo').where({
+                  _openid: Megalo.getStorageSync('openid')
+                }).update({
+                  data: {
+                    balance: Megalo.getStorageSync('balance') - this.totalMoney
+                  },
+                  success: _ => {
+                    wx.showToast({
+                      title: '支付成功',
+                      duration: 3000,
+                      success: _ => {
+                        setTimeout(_ => {
+                          wx.navigateTo({
+                            url: '/pages/mall/orderList'
+                          })
+                        }, 2000)
+                      }
+                    })
+                  }
+                })
+              }
+            })
+          } else if (res.cancel) {
+            this.$db.collection('orderList').add({
+              data: {
+                name: this.dataList.name,
+                orderId: `2020${Math.ceil(Math.random() * 1000)}`,
+                orderStatus: '待付款',
+                orderType: 1,
+                price: this.totalMoney,
+                time: `${year}-${month}-${day}`
+              }
+            })
           }
         }
       })
