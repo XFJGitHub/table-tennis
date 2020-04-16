@@ -26,7 +26,7 @@
 
     <div class="my-body">
       <div class="flex align_center" @click="toRecharge">
-        <i class="icon_setting m_20" />
+        <i class="icon_recharge m_20" />
         <div class="icon-text-wrap" style="border:none">
           <div class="icon-text">充值中心</div>
           <i class="icon_right" />
@@ -34,13 +34,21 @@
       </div>
     </div>
     <div class="my-body">
+      <div class="flex align_center" @click="toBill">
+        <i class="icon_bill m_20" />
+        <div class="icon-text-wrap">
+          <div class="icon-text">账单</div>
+          <div class="flex align_center">
+            <i class="icon_right ml_10" />
+          </div>
+        </div>
+      </div>
       <div class="flex align_center">
         <i class="icon_money m_20" />
         <div class="icon-text-wrap">
           <div class="icon-text">余额</div>
           <div class="flex align_center">
             <div class="color_156">{{balance}}.00元</div>
-            <!-- <i class="icon_right ml_10" /> -->
           </div>
         </div>
       </div>
@@ -129,7 +137,7 @@ export default {
         }).get({
           success: res => {
             this.balance = res.data[0].balance
-            Megalo.setStorageSync('balance', res.data[0].balance)
+            Megalo.setStorageSync('balance', Number(res.data[0].balance))
             this.isSeller = res.data[0].isSeller
           }
         })
@@ -162,10 +170,16 @@ export default {
         }
       })
     },
-    // 投诉与建议
+    // 充值中心
     toRecharge () {
       wx.navigateTo({
         url: '/pages/my/recharge'
+      })
+    },
+    // 账单
+    toBill () {
+      wx.navigateTo({
+        url: '/pages/my/bill'
       })
     },
     // 投诉与建议

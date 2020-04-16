@@ -37,6 +37,7 @@ export default {
       'pages/my/my',
       'pages/my/advice',
       'pages/my/recharge',
+      'pages/my/bill',
       'pages/my/setting'
     ],
     tabBar: {

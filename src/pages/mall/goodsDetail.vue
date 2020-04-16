@@ -80,7 +80,7 @@ export default {
         success: res => {
           const date = new Date()
           const year = date.getFullYear()
-          const month = (date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
+          const month = date.getMonth() + 1
           const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
           const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
           const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
@@ -95,7 +95,8 @@ export default {
                   orderStatus: '已完成',
                   orderType: 0,
                   price: this.totalMoney,
-                  time: `${year}-${month}-${day} ${hour}:${minutes}:${ss}`
+                  url: this.dataList.url[0],
+                  time: `${year}-${month < 10 ? '0' + month : month}-${day} ${hour}:${minutes}:${ss}`
                 },
                 success: res => {
                   // 付钱
@@ -110,6 +111,16 @@ export default {
                         title: '支付成功',
                         duration: 3000,
                         success: _ => {
+                          // 生成账单
+                          this.$db.collection('billList').add({
+                            data: {
+                              name: this.dataList.name,
+                              isIncome: false,
+                              price: '-' + this.totalMoney,
+                              url: this.dataList.url[0],
+                              time: `${month}月${day}日 ${hour}:${minutes}:${ss}`
+                            }
+                          })
                           setTimeout(_ => {
                             wx.navigateTo({
                               url: '/pages/mall/orderList'
@@ -140,6 +151,7 @@ export default {
                 orderStatus: '待付款',
                 orderType: 1,
                 price: this.totalMoney,
+                url: this.dataList.url[0],
                 time: `${year}-${month}-${day} ${hour}:${minutes}:${ss}`
               }
             })

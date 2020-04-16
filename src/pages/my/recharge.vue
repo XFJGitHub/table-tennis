@@ -22,13 +22,27 @@ export default {
   },
   methods: {
     recharge () {
+      const date = new Date()
+      const month = date.getMonth() + 1
+      const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
+      const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
+      const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
       this.$db.collection('userInfo').where({
         _openid: Megalo.getStorageSync('openid')
       }).update({
         data: {
-          balance: Number(Megalo.getStorageSync('balance')) + this.rechargeNum
+          balance: Megalo.getStorageSync('balance') + Number(this.rechargeNum)
         },
         success: _ => {
+          this.$db.collection('billList').add({
+            data: {
+              name: `充值余额`,
+              isIncome: true,
+              price: '+' + this.rechargeNum,
+              url: 'https://static.dingdandao.com/da4beb15dab1194cc20efefb6ba0d2fe',
+              time: `${month}月${day}日 ${hour}:${minutes}`
+            }
+          })
           wx.showToast({
             title: '充值成功',
             duration: 3000,
