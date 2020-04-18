@@ -186,3 +186,43 @@
     width: 30rpx;
     height: 30rpx;
 }
+
+//添加球桌的加号
+.icon_add {
+    display: block;
+    background-image: url('https://static.dingdandao.com/dd58ca3251bb35be3156d23c70b1b319');
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 30rpx;
+    height: 30rpx;
+}
+
+//编辑
+.icon_edit {
+    display: block;
+    background-image: url('https://static.dingdandao.com/dbfc31a407136586ebccf1b59ef76803');
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 40rpx;
+    height: 40rpx;
+}
+
+//垃圾桶
+.icon_delete {
+    display: block;
+    background-image: url('https://static.dingdandao.com/2be94df5e236bc449403fafd01184d51');
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 30rpx;
+    height: 30rpx;
+}
+
+//weChat Pay
+.icon_wechatPay {
+    display: block;
+    background-image: url('https://static.dingdandao.com/89b9906eb2e3a7e1e9cdbe1e1d9b45a9');
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 50rpx;
+    height: 50rpx;
+}

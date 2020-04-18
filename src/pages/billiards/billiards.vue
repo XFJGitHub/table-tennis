@@ -5,6 +5,10 @@
 </config>
 <template>
   <div>
+    <div class="head-tip">
+      <div>*</div>
+      <div>不足半小时的按半小时计算，超过半小时的按一小时计算，请合理安排时间</div>
+    </div>
     <div class="tables-wrap">
       <scroll-view
         style="height:1000rpx"
@@ -12,33 +16,33 @@
       >
         <div class="scroll-wrap">
           <div class="line_height1 mb_10 flex_column align_center" v-for="(item, index) in tableList" :key="index">
-            <img style="width:300rpx;height:300rpx;" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=4133050358,1709979582&fm=26&gp=0.jpg">
-            <div class="my_20">
-              <div class="table-title">{{item.name}}</div>
-              <div class="table-title mt_20">￥{{item.price}}</div>
+            <div @click="item.isUsing = !item.isUsing" style="width:600rpx;height:300rpx;">
+              <img v-if="item.disable" style="width:100%;height:100%;" src="https://static.dingdandao.com/0ece7207a7eecd7361045572d97b08fb">
+              <img v-else style="width:100%;height:100%;" :src="item.isUsing ? 'https://static.dingdandao.com/df9f037eb9fcc2ae4ac8d6486d8241da' : 'https://static.dingdandao.com/2fd09d05fca5e2bb72a8e6c838a1511a'">
             </div>
-            <div class="flex">
-              <button class="t-button mr_20" @click="toAppointment(item.id)">预约</button>
-              <button class="t-button t-button-success">开台</button>
+            <div style="width:100%" class="my_20 justify_between align_center">
+              <div class="flex">
+                <div class="table-title">{{item.name}}</div>
+                <div class="table-title ml_20">￥{{item.price}}</div>
+              </div>
+              <div class="flex">
+                <div @click="useTable(item)" v-if="!item.disable" class="ml_10 t-button t-button-primary">开台</div>
+              </div>
             </div>
+            <div v-if="item.startTime || startTime" style="width:100%" class="justify_between align_center">
+              <div class="flex">
+                <div class="table-title">开始时间：</div>
+                <div class="table-title">{{item.startTime.slice(5)}}</div>
+              </div>
+              <div @click="settleAccount(item)" class="t-button t-button-primary">结账</div>
+            </div>
+            <!-- <div class="flex"> -->
+              <!-- <button class="t-button mr_20" @click="toAppointment(item.id)">预约</button> -->
+            <!-- </div> -->
           </div>
         </div>
       </scroll-view>
     </div>
-
-    <div class="tables-wrap mt_20">
-      <div class="flex">
-        <div>开始时间：</div>
-        <div>{{startTime}}</div>
-      </div>
-      <div class="flex">
-        <div>结束时间：</div>
-        <div>{{endTime}}</div>
-      </div>
-    </div>
-
-    <button @click="settleAccount" class="close-button">结账</button>
-
   </div>
 </template>
 
@@ -46,40 +50,135 @@
 export default {
   data () {
     return {
-      tableList: [
-        {
-          id: 0,
-          name: '星牌-1',
-          price: '30'
-        },
-        {
-          name: '乔氏-1',
-          price: '30'
-        },
-        {
-          name: '乔氏-2',
-          price: '30'
-        },
-        {
-          name: '普通-1',
-          price: '18'
-        }
-      ],
-      startTime: '14:22',
-      endTime: '15:22'
+      tableList: [],
+      isUsing: false,
+      startTime: '',
+      endTime: '',
+      totalMoney: undefined
     }
   },
+  onLoad () {
+    this.getData()
+  },
   methods: {
-    toAppointment (id) {
-      wx.navigateTo({
-        url: `/pages/billiards/appointment?tableId=${id}`
+    getData () {
+      this.$db.collection('tables').get({
+        success: res => {
+          this.tableList = res.data
+          this.startTime = res.data[0].startTime
+        }
       })
     },
-    settleAccount () {
-      wx.showToast({
-        title: `您消费时间共1小时，消费金额${this.endTime}`,
-        icon: 'none',
-        duration: 5000
+    useTable (row) {
+      let usingStatus = false
+      const date = new Date()
+      const year = date.getFullYear()
+      const month = (date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
+      const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
+      const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
+      const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+      this.$db.collection('tables').where({
+        _id: row._id
+      }).get({
+        success: res => {
+          usingStatus = res.data[0].isUsing
+          if (usingStatus) {
+            wx.showToast({
+              title: '该桌子正在使用中，请尝试其他桌子',
+              icon: 'none'
+            })
+          } else {
+            this.startTime = `${year}-${month}-${day} ${hour}:${minutes}`
+            this.$db.collection('tables').where({
+              _id: row._id
+            }).update({
+              data: {
+                startTime: this.startTime,
+                isUsing: true
+              }
+            })
+            this.getData()
+          }
+        }
+      })
+    },
+    // toAppointment (id) {
+    //   wx.navigateTo({
+    //     url: `/pages/billiards/appointment?tableId=${id}`
+    //   })
+    // },
+    // 生成账单
+    setBills (month, day, hour, minutes, ss) {
+      this.$db.collection('billList').add({
+        data: {
+          isIncome: false,
+          name: '台费',
+          price: '-' + this.totalMoney,
+          time: `${month}月${day}日 ${hour}:${minutes}:${ss}`,
+          startTime: this.startTime,
+          endTime: this.endTime,
+          url: 'https://static.dingdandao.com/0daecc4ad851a61763ada65c727212ff'
+        }
+      })
+    },
+    settleAccount (row) {
+      const date = new Date()
+      const year = date.getFullYear()
+      const month = (date.getMonth() + 1)
+      const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
+      const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
+      const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+      const ss = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
+      this.endTime = `${year}-${month < 10 ? '0' + month : month}-${day} ${hour}:${minutes}`
+      const diffSeconds = (new Date(this.endTime).getTime()) - (new Date(this.startTime).getTime())
+      const tableHour = Math.floor(diffSeconds / 1000 / 3600)
+      const tableMinute = diffSeconds / 1000 / 60 % 60
+      console.log(tableHour, 'h')
+      console.log(tableMinute, 'm')
+      if (tableMinute < 30 && tableMinute > 0) {
+        this.totalMoney = (tableHour + 0.5) * row.price
+      } else if (tableMinute === 0 && tableMinute === 0) {
+        this.totalMoney = 0
+      } else {
+        this.totalMoney = (tableHour + 1) * row.price
+      }
+      wx.showModal({
+        title: '消费金额',
+        content: `您消费时间共${tableHour}小时${tableMinute < 10 ? '0' + tableMinute : tableMinute}分，消费金额为${this.totalMoney}元`,
+        success: res => {
+          if (res.confirm) {
+            wx.showToast({
+              title: '支付成功',
+              icon: 'none',
+              success: _ => {
+                this.$db.collection('tables').where({
+                  _id: row._id
+                }).update({
+                  data: {
+                    startTime: '',
+                    isUsing: false
+                  }
+                })
+                this.setBills(month, day, hour, minutes, ss)
+                this.$db.collection('userInfo').where({
+                  _openid: Megalo.getStorageSync('openid')
+                }).update({
+                  data: {
+                    balance: Megalo.getStorageSync('balance') - this.totalMoney
+                  }
+                })
+                setTimeout(_ => {
+                  wx.reLaunch({ url: `/pages/billiards/billiardsDetail?startTime=${this.startTime}&endTime=${this.endTime}&totalMoney=${this.totalMoney}` })
+                }, 2000)
+              }
+            })
+          } else if (res.cancel) {
+            wx.showToast({
+              title: '支付失败，请尽快支付',
+              icon: 'none'
+            })
+          }
+        }
       })
     }
   }
@@ -89,6 +188,13 @@ export default {
 <style lang='scss'>
 page {
   background: #F4F4F4;
+}
+.head-tip {
+  display: flex;
+  background: #fff;
+  font-size: 26rpx;
+  color: cornflowerblue;
+  padding: 20rpx;
 }
 .tables-wrap {
   border-radius: 30rpx;

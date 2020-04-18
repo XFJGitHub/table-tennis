@@ -28,6 +28,9 @@ export default {
     pages: [
       'pages/index/index',
       'pages/billiards/billiards',
+      'pages/billiards/billiardsDetail',
+      'pages/billiards/managementTable',
+      'pages/billiards/addTable',
       'pages/billiards/appointment',
       'pages/video/video',
       'pages/video/articleDetail',

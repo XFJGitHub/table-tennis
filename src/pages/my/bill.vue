@@ -8,7 +8,7 @@
     <div
       v-for="(item, ind) in dataList"
       :key="ind"
-      class="flex align_center p_20 pr_0"
+      class="flex p_20 pr_0"
     >
       <div style="width: 80rpx;height:80rpx">
         <img :src="item.url" class="bill-img">

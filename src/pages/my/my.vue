@@ -88,10 +88,17 @@
     </div>
     <div>
       <div class="my-body">
-        <div class="flex align_center">
+        <div class="flex align_center" @click="toOtherPages(0)">
           <i class="icon_reports m_20" />
           <div class="icon-text-wrap">
             <div class="icon-text">查看报表</div>
+            <i class="icon_right" />
+          </div>
+        </div>
+        <div class="flex align_center" @click="toOtherPages(1)">
+          <i class="icon_reports m_20" />
+          <div class="icon-text-wrap">
+            <div class="icon-text">球桌管理</div>
             <i class="icon_right" />
           </div>
         </div>
@@ -198,6 +205,18 @@ export default {
     toBilliards () {
       wx.switchTab({
         url: '/pages/billiards/billiards'
+      })
+    },
+    toOtherPages (num) {
+      const url = {
+        0: '',
+        1: '/pages/billiards/managementTable'
+      }
+      wx.navigateTo({
+        url: url[num],
+        fail: err => {
+          console.log(err)
+        }
       })
     },
     // 暂停营业
