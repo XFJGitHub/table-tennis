@@ -37,10 +37,12 @@ export default {
       'pages/mall/mall',
       'pages/mall/goodsDetail',
       'pages/mall/orderList',
+      'pages/mall/orderDetail',
       'pages/my/my',
       'pages/my/advice',
       'pages/my/recharge',
       'pages/my/bill',
+      'pages/my/billDetail',
       'pages/my/setting'
     ],
     tabBar: {

@@ -60,13 +60,13 @@
         </div>
       </div>
 
-      <div class="flex align_center" @click="toBilliards">
+      <!-- <div class="flex align_center" @click="toBilliards">
         <i class="icon_time m_20" />
         <div class="icon-text-wrap">
           <div class="icon-text">预约球桌</div>
           <i class="icon_right" />
         </div>
-      </div>
+      </div> -->
 
       <div class="flex align_center" @click="toAdvice">
         <i class="icon_advice m_20" />
@@ -96,7 +96,7 @@
           </div>
         </div>
         <div class="flex align_center" @click="toOtherPages(1)">
-          <i class="icon_reports m_20" />
+          <i class="icon_tables m_20" />
           <div class="icon-text-wrap">
             <div class="icon-text">球桌管理</div>
             <i class="icon_right" />
@@ -120,7 +120,7 @@ export default {
     return {
       avatarUrl: Megalo.getStorageSync('avatarUrl'),
       nickName: Megalo.getStorageSync('nickName'),
-      balance: '',
+      balance: 0,
       isSeller: false,
       stopBusinessStatus: false
     }
@@ -144,7 +144,6 @@ export default {
         }).get({
           success: res => {
             this.balance = res.data[0].balance
-            Megalo.setStorageSync('balance', Number(res.data[0].balance))
             this.isSeller = res.data[0].isSeller
           }
         })
@@ -162,6 +161,7 @@ export default {
           res.data.map(e => {
             if (e._openid === Megalo.getStorageSync('openid')) {
               userExist = true
+              this.getData()
             }
           })
           if (userExist === false) {
@@ -220,7 +220,16 @@ export default {
       })
     },
     // 暂停营业
-    changeBussinessStatus () {}
+    changeBussinessStatus () {
+      this.stopBusinessStatus = !this.stopBusinessStatus
+      this.$db.collection('checkStatus').where({
+        _openid: Megalo.getStorageSync('openid')
+      }).update({
+        data: {
+          isClosed: this.stopBusinessStatus
+        }
+      })
+    }
   }
 }
 </script>

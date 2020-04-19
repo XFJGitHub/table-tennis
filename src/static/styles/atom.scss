@@ -25,6 +25,11 @@
 .flex-grow {
     flex-grow: 1;
 }
+
+.flex_shrink {
+    flex-shrink: 0;
+}
+
 .flex_row {
     -webkit-box-orient: horizontal;
     -webkit-box-direction: normal;
@@ -739,8 +744,16 @@
     margin-right: 50px;
 }
 
+.mx_40 {
+    margin:0  40rpx;
+}
+
 .py_20 {
     padding: 20rpx 0;
+}
+
+.px_40 {
+    padding: 0 40rpx;
 }
 
 .p_0 {
@@ -1363,6 +1376,10 @@
 
 .fontsize_32 {
     font-size: 32rpx;
+}
+
+.fontsize_36 {
+    font-size: 36rpx;
 }
 
 .fontsize_40 {

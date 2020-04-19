@@ -3,6 +3,17 @@
 @import './index.scss';
 @import './color.scss';
 
+.suc-btn {
+    position: fixed;
+    bottom: 80rpx;
+    background: #f2f2f2;
+    padding: 20rpx;
+    color: #5cc118;
+    width: 400rpx;
+    text-align: center;
+    border-radius: 5rpx;
+}
+
 .t-button {
     background: white;
     padding: 16px 40px;
@@ -14,6 +25,10 @@
 .t-button-primary {
     background: #3399FF;
     color: white;
+}
+
+.t-button-ghost {
+    border: 1px solid #e5e5e5;
 }
 
 .t-button-success {

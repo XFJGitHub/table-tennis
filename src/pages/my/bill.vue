@@ -6,6 +6,7 @@
 <template>
   <div class="bill-wrap">
     <div
+      @click="toBillDetails(item)"
       v-for="(item, ind) in dataList"
       :key="ind"
       class="flex p_20 pr_0"
@@ -44,6 +45,11 @@ export default {
             return e
           })
         }
+      })
+    },
+    toBillDetails (row) {
+      wx.navigateTo({
+        url: `/pages/my/billDetail?id=${row._id}`
       })
     }
   },

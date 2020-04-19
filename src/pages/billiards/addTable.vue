@@ -22,6 +22,7 @@ export default {
     submit () {
       this.$db.collection('tables').add({
         data: {
+          disable: false,
           isUsing: false,
           name: this.tableName,
           price: this.tablePrice,

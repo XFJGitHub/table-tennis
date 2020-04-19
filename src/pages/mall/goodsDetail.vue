@@ -25,8 +25,38 @@
       </div>
     </div>
 
+    <div class="mx_40 pt_20" style="margin-top:-40rpx;border-top:1px solid #e5e5e5">
+      <radio-group @change="radioChange">
+        <radio
+          style="zoom:.8"
+          class="mr_20"
+          v-for="(item, ind) in radioList"
+          :key="ind"
+          :value="item.id"
+          :checked="item.checked"
+          color="#6666FF"
+        >
+          <text>{{item.name}}</text>
+        </radio>
+      </radio-group>
+      <template v-if="toHouse">
+        <div class='flex mt_20 fontsize_30'>
+          <div style="width: 200rpx;">收货人</div>
+          <input type="text" placeholder="请输入收货人姓名" v-model="sName">
+        </div>
+        <div class='flex fontsize_30'>
+          <div style="width: 200rpx">收货地址</div>
+          <input type="text" placeholder="请输入收货地址" v-model="sAddress">
+        </div>
+        <div class='flex fontsize_30'>
+          <div style="width: 200rpx">联系方式</div>
+          <input type="text" placeholder="请输入收货人联系方式" v-model="sPhone">
+        </div>
+      </template>
+    </div>
+
     <div class="goods-bottom">
-      <div class="">
+      <div>
         共计金额<span class="color_ff4">￥{{totalMoney}}</span>
       </div>
       <div class="flex">
@@ -42,7 +72,22 @@ export default {
   data () {
     return {
       dataList: {},
-      goodsNum: 1
+      goodsNum: 1,
+      toHouse: false,
+      sName: '',
+      sAddress: '',
+      sPhone: '',
+      radioList: [
+        {
+          id: 0,
+          name: '自提',
+          checked: true
+        },
+        {
+          id: 1,
+          name: '送货上门'
+        }
+      ]
     }
   },
   computed: {
@@ -51,6 +96,9 @@ export default {
     }
   },
   methods: {
+    radioChange (e) {
+      e.detail.value === '1' ? this.toHouse = true : this.toHouse = false
+    },
     getData (id) {
       const db = wx.cloud.database()
       db.collection('goods').where({
@@ -85,64 +133,78 @@ export default {
           const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
           const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
           const ss = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
+          let nowBalance
           if (res.confirm) {
-            if (Megalo.getStorageSync('balance') >= this.totalMoney) {
-              // 生成订单
-              this.$db.collection('orderList').add({
-                data: {
-                  name: this.dataList.name,
-                  orderId: `2020${Math.ceil(Math.random() * 10000)}`,
-                  orderStatus: '已完成',
-                  orderType: 0,
-                  price: this.totalMoney,
-                  url: this.dataList.url[0],
-                  time: `${year}-${month < 10 ? '0' + month : month}-${day} ${hour}:${minutes}:${ss}`
-                },
-                success: res => {
-                  // 付钱
-                  this.$db.collection('userInfo').where({
-                    _openid: Megalo.getStorageSync('openid')
-                  }).update({
+            this.$db.collection('userInfo').where({
+              _openid: Megalo.getStorageSync('openid')
+            }).get({
+              success: res => {
+                nowBalance = res.data[0].balance
+                if (nowBalance >= this.totalMoney) {
+                  // 生成订单
+                  this.$db.collection('orderList').add({
                     data: {
-                      balance: Megalo.getStorageSync('balance') - this.totalMoney
+                      name: this.dataList.name,
+                      orderId: `2020${Math.ceil(Math.random() * 10000)}`,
+                      orderStatus: '已完成',
+                      orderType: 0,
+                      price: this.totalMoney,
+                      count: this.goodsNum,
+                      sName: this.sName,
+                      sAddress: this.sAddress,
+                      sPhone: this.sPhone,
+                      sType: this.toHouse ? '送货上门' : '自提',
+                      url: this.dataList.url[0],
+                      time: `${year}-${month < 10 ? '0' + month : month}-${day} ${hour}:${minutes}:${ss}`
                     },
-                    success: _ => {
-                      wx.showToast({
-                        title: '支付成功',
-                        duration: 3000,
+                    success: res => {
+                      // 付钱
+                      this.$db.collection('userInfo').where({
+                        _openid: Megalo.getStorageSync('openid')
+                      }).update({
+                        data: {
+                          balance: nowBalance - this.totalMoney
+                        },
                         success: _ => {
-                          // 生成账单
-                          this.$db.collection('billList').add({
-                            data: {
-                              name: this.dataList.name,
-                              isIncome: false,
-                              price: '-' + this.totalMoney,
-                              url: this.dataList.url[0],
-                              time: `${month}月${day}日 ${hour}:${minutes}:${ss}`
+                          wx.showToast({
+                            title: '支付成功',
+                            duration: 3000,
+                            success: _ => {
+                              // 生成账单
+                              this.$db.collection('billList').add({
+                                data: {
+                                  name: this.dataList.name,
+                                  isIncome: false,
+                                  price: '-' + this.totalMoney,
+                                  url: this.dataList.url[0],
+                                  time: `${month}月${day}日 ${hour}:${minutes}:${ss}`
+                                }
+                              })
+                              setTimeout(_ => {
+                                wx.navigateTo({
+                                  url: '/pages/mall/orderList'
+                                })
+                              }, 2000)
                             }
                           })
-                          setTimeout(_ => {
-                            wx.navigateTo({
-                              url: '/pages/mall/orderList'
-                            })
-                          }, 2000)
                         }
                       })
                     }
                   })
-                }
-              })
-            } else {
-              wx.showToast({
-                title: '很抱歉您的余额不足，请前往充值',
-                icon: 'none',
-                success: _ => {
-                  wx.navigateTo({
-                    url: '/pages/my/recharge'
+                } else {
+                  console.log(nowBalance)
+                  wx.showToast({
+                    title: '很抱歉您的余额不足，请前往充值',
+                    icon: 'none',
+                    success: _ => {
+                      wx.navigateTo({
+                        url: '/pages/my/recharge'
+                      })
+                    }
                   })
                 }
-              })
-            }
+              }
+            })
           } else if (res.cancel) {
             this.$db.collection('orderList').add({
               data: {
@@ -150,6 +212,11 @@ export default {
                 orderId: `2020${Math.ceil(Math.random() * 1000)}`,
                 orderStatus: '待付款',
                 orderType: 1,
+                count: this.goodsNum,
+                sName: this.sName,
+                sAddress: this.sAddress,
+                sPhone: this.sPhone,
+                sType: this.toHouse ? '送货上门' : '自提',
                 price: this.totalMoney,
                 url: this.dataList.url[0],
                 time: `${year}-${month}-${day} ${hour}:${minutes}:${ss}`

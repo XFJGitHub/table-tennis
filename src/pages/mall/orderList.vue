@@ -11,7 +11,12 @@
     </div>
 
     <div v-if="dataList.length > 0">
-      <div class="order_wrap_shadow" v-for="(item, index) in dataList" :key="index">
+      <div
+        @click="toOderDetail(item._id)"
+        class="order_wrap_shadow"
+        v-for="(item, index) in dataList"
+        :key="index"
+      >
         <div class="order_wrap">
           <div class="justify_between align_center order-status">
             <div class="order-time">订单编号:{{item.orderId}}</div>
@@ -23,7 +28,7 @@
           </div>
           <div class="justify_between align_center mt_40">
             <div class="order-price">￥{{item.price}}</div>
-            <div v-if="item.orderStatus === '待付款'" class="pay-button">支付</div>
+            <div @click="toOderDetail(item._id)" v-if="item.orderStatus === '待付款'" class="pay-button">支付</div>
           </div>
         </div>
       </div>
@@ -64,6 +69,11 @@ export default {
     changeTab (type) {
       this.activeTab = type
       this.getData()
+    },
+    toOderDetail (id) {
+      wx.navigateTo({
+        url: `/pages/mall/orderDetail?_id=${id}`
+      })
     }
   },
   onLoad () {

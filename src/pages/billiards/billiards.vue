@@ -4,12 +4,12 @@
   }
 </config>
 <template>
-  <div>
+  <div class="h_100">
     <div class="head-tip">
       <div>*</div>
       <div>不足半小时的按半小时计算，超过半小时的按一小时计算，请合理安排时间</div>
     </div>
-    <div class="tables-wrap">
+    <div v-if="!isClosed" class="tables-wrap">
       <scroll-view
         style="height:1000rpx"
         scroll-y
@@ -29,7 +29,7 @@
                 <div @click="useTable(item)" v-if="!item.disable" class="ml_10 t-button t-button-primary">开台</div>
               </div>
             </div>
-            <div v-if="item.startTime || startTime" style="width:100%" class="justify_between align_center">
+            <div v-if="item.startTime" style="width:100%" class="justify_between align_center">
               <div class="flex">
                 <div class="table-title">开始时间：</div>
                 <div class="table-title">{{item.startTime.slice(5)}}</div>
@@ -43,6 +43,10 @@
         </div>
       </scroll-view>
     </div>
+    <div style="background:#fff" class="h_100 align_center flex_column" v-else>
+      <img style="width:260rpx;height:260rpx;margin-top:100rpx" src="https://static.dingdandao.com/4d102a263b12b46b4b981dd80d9f6602">
+      <div style="color: #a3b1bf" class="mt_20 fontsize_26">很抱歉，商家暂停了营业</div>
+    </div>
   </div>
 </template>
 
@@ -50,22 +54,31 @@
 export default {
   data () {
     return {
+      isClosed: false,
       tableList: [],
       isUsing: false,
-      startTime: '',
-      endTime: '',
       totalMoney: undefined
     }
   },
   onLoad () {
     this.getData()
+    this.getStatus()
   },
   methods: {
     getData () {
       this.$db.collection('tables').get({
         success: res => {
           this.tableList = res.data
-          this.startTime = res.data[0].startTime
+          console.log(this.tableList)
+        }
+      })
+    },
+    getStatus () {
+      this.$db.collection('checkStatus').where({
+        _openid: Megalo.getStorageSync('openid')
+      }).get({
+        success: res => {
+          this.isClosed = res.data[0].isClosed
         }
       })
     },
@@ -88,12 +101,12 @@ export default {
               icon: 'none'
             })
           } else {
-            this.startTime = `${year}-${month}-${day} ${hour}:${minutes}`
+            const startTime = `${year}-${month}-${day} ${hour}:${minutes}`
             this.$db.collection('tables').where({
               _id: row._id
             }).update({
               data: {
-                startTime: this.startTime,
+                startTime: startTime,
                 isUsing: true
               }
             })
@@ -108,20 +121,22 @@ export default {
     //   })
     // },
     // 生成账单
-    setBills (month, day, hour, minutes, ss) {
+    setBills (startTime, endTime, month, day, hour, minutes, ss, balance) {
       this.$db.collection('billList').add({
         data: {
           isIncome: false,
-          name: '台费',
+          name: '付款给EGE Clube',
           price: '-' + this.totalMoney,
+          balance: balance,
           time: `${month}月${day}日 ${hour}:${minutes}:${ss}`,
-          startTime: this.startTime,
-          endTime: this.endTime,
+          startTime: startTime,
+          endTime: endTime,
           url: 'https://static.dingdandao.com/0daecc4ad851a61763ada65c727212ff'
         }
       })
     },
     settleAccount (row) {
+      console.log(row)
       const date = new Date()
       const year = date.getFullYear()
       const month = (date.getMonth() + 1)
@@ -129,10 +144,11 @@ export default {
       const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
       const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
       const ss = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
-      this.endTime = `${year}-${month < 10 ? '0' + month : month}-${day} ${hour}:${minutes}`
-      const diffSeconds = (new Date(this.endTime).getTime()) - (new Date(this.startTime).getTime())
+      const endTime = `${year}-${month < 10 ? '0' + month : month}-${day} ${hour}:${minutes}`
+      const diffSeconds = (new Date(endTime).getTime()) - (new Date(row.startTime).getTime())
       const tableHour = Math.floor(diffSeconds / 1000 / 3600)
       const tableMinute = diffSeconds / 1000 / 60 % 60
+      console.log(endTime, 'en')
       console.log(tableHour, 'h')
       console.log(tableMinute, 'm')
       if (tableMinute < 30 && tableMinute > 0) {
@@ -146,6 +162,7 @@ export default {
         title: '消费金额',
         content: `您消费时间共${tableHour}小时${tableMinute < 10 ? '0' + tableMinute : tableMinute}分，消费金额为${this.totalMoney}元`,
         success: res => {
+          let nowBalance
           if (res.confirm) {
             wx.showToast({
               title: '支付成功',
@@ -159,16 +176,23 @@ export default {
                     isUsing: false
                   }
                 })
-                this.setBills(month, day, hour, minutes, ss)
                 this.$db.collection('userInfo').where({
                   _openid: Megalo.getStorageSync('openid')
-                }).update({
-                  data: {
-                    balance: Megalo.getStorageSync('balance') - this.totalMoney
+                }).get({
+                  success: res => {
+                    nowBalance = res.data[0].balance
+                    this.setBills(row.startTime, endTime, month, day, hour, minutes, ss, nowBalance)
+                    this.$db.collection('userInfo').where({
+                      _openid: Megalo.getStorageSync('openid')
+                    }).update({
+                      data: {
+                        balance: nowBalance - this.totalMoney
+                      }
+                    })
                   }
                 })
                 setTimeout(_ => {
-                  wx.reLaunch({ url: `/pages/billiards/billiardsDetail?startTime=${this.startTime}&endTime=${this.endTime}&totalMoney=${this.totalMoney}` })
+                  wx.reLaunch({ url: `/pages/billiards/billiardsDetail?startTime=${row.startTime}&endTime=${endTime}&totalMoney=${this.totalMoney}` })
                 }, 2000)
               }
             })
@@ -187,6 +211,7 @@ export default {
 
 <style lang='scss'>
 page {
+  height: 100%;
   background: #F4F4F4;
 }
 .head-tip {
