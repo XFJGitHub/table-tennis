@@ -7,9 +7,10 @@
   <div>
     <div class="p_40 flex border_bottom">
       充值金额：
-      <input type="number" v-model="rechargeNum" placeholder="请输入充值金额">
+      <input maxlength="7" type="number" v-model="rechargeNum" placeholder="请输入充值金额">
     </div>
     <div @click="recharge" class="m_20 t-button t-button-primary">充值</div>
+    <div class="color_156 fontsize_26 p_20">温馨提示:只能充值小于一百万~</div>
   </div>
 </template>
 

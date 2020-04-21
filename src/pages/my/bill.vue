@@ -5,22 +5,27 @@
 </config>
 <template>
   <div class="bill-wrap">
-    <div
-      @click="toBillDetails(item)"
-      v-for="(item, ind) in dataList"
-      :key="ind"
-      class="flex p_20 pr_0"
-    >
-      <div style="width: 80rpx;height:80rpx">
-        <img :src="item.url" class="bill-img">
-      </div>
-      <div class="bill-text flex-grow">
-        <div>
-          <div style="width:450rpx" class="text-ellipsis">{{item.name}}</div>
-          <div class="mt_20 fontsize_24 color_156">{{item.time}}</div>
+    <template v-if="dataList.length > 0">
+      <div
+        @click="toBillDetails(item)"
+        v-for="(item, ind) in dataList"
+        :key="ind"
+        class="flex p_20 pr_0">
+        <div class="flex_shrink" style="width: 80rpx;height:80rpx">
+          <img class="bill-img" :src="item.url" >
         </div>
-        <div :style="{color: item.isIncome ? '#CD853F' : ''}">{{item.price}}</div>
+        <div class="bill-text flex-grow">
+          <div>
+            <div style="width:450rpx" class="text-ellipsis">{{item.name}}</div>
+            <div class="mt_20 fontsize_24 color_156">{{item.time}}</div>
+          </div>
+          <div :style="{color: item.isIncome ? '#CD853F' : ''}">{{item.price}}</div>
+        </div>
       </div>
+    </template>
+    <div class="align_center flex_column" v-else>
+      <img style="margin-top: 200rpx;width: 280rpx;height:200rpx" src="https://static.dingdandao.com/612007ba2dc43b5c6646f19fe54a4206">
+      <div style="color: #a3b1bf" class="mt_20 fontsize_26">暂无数据</div>
     </div>
   </div>
 </template>

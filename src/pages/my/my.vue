@@ -14,7 +14,7 @@
       </div>
       <div class="ml_40">
         <div v-if="!nickName">
-          <button hover-class="none" class="button-noclass" open-type="getUserInfo" lang="zh_CN" @getuserinfo="getUserInfo">点击显示微信头像</button>
+          <button hover-class="none" class="button-noclass" open-type="getUserInfo" lang="zh_CN" @getuserinfo="getUserInfo">点击登录显示微信头像</button>
           <div class="mt_30 fontsize_30 color_156">游客</div>
         </div>
         <div v-else>
@@ -86,7 +86,7 @@
         </div>
       </div>
     </div>
-    <div>
+    <div v-if="isSeller">
       <div class="my-body">
         <div class="flex align_center" @click="toOtherPages(0)">
           <i class="icon_reports m_20" />
@@ -126,12 +126,6 @@ export default {
     }
   },
   onLoad () {
-    wx.cloud.callFunction({
-      name: 'demo',
-      complete: res => {
-        Megalo.setStorageSync('openid', res.result.openid)
-      }
-    })
   },
   onShow () {
     this.getData()
@@ -147,10 +141,21 @@ export default {
             this.isSeller = res.data[0].isSeller
           }
         })
+        this.$db.collection('checkStatus').get({
+          success: res => {
+            this.stopBusinessStatus = res.data[0].isClosed
+          }
+        })
       }
     },
     // 获取用户信息
     getUserInfo (e) {
+      wx.cloud.callFunction({
+        name: 'demo',
+        complete: res => {
+          Megalo.setStorageSync('openid', res.result.openid)
+        }
+      })
       this.nickName = e.detail.userInfo.nickName
       this.avatarUrl = e.detail.userInfo.avatarUrl
       Megalo.setStorageSync('nickName', e.detail.userInfo.nickName)

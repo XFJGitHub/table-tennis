@@ -84,7 +84,7 @@ export default {
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
-      navigationBarTitleText: '台球厅',
+      navigationBarTitleText: 'EGE Clube',
       navigationBarTextStyle: 'black'
     }
     // usingComponents: {

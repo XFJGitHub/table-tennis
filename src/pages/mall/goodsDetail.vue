@@ -123,120 +123,135 @@ export default {
 
     },
     buy () {
-      wx.showModal({
-        content: `需要支付总金额为￥${this.totalMoney}`,
-        success: res => {
-          const date = new Date()
-          const year = date.getFullYear()
-          const month = (date.getMonth() + 1)
-          const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
-          const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
-          const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
-          const ss = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
-          let nowBalance
-          if (res.confirm) {
-            this.$db.collection('userInfo').where({
-              _openid: Megalo.getStorageSync('openid')
-            }).get({
-              success: res => {
-                nowBalance = res.data[0].balance
-                if (nowBalance >= this.totalMoney) {
-                  // 生成订单
-                  this.$db.collection('orderList').add({
-                    data: {
-                      name: this.dataList.name,
-                      orderId: `2020${Math.ceil(Math.random() * 10000)}`,
-                      orderStatus: '已完成',
-                      orderType: 0,
-                      price: this.totalMoney,
-                      count: this.goodsNum,
-                      sName: this.sName,
-                      sAddress: this.sAddress,
-                      sPhone: this.sPhone,
-                      sType: this.toHouse ? '送货上门' : '自提',
-                      url: this.dataList.url[0],
-                      time: `${year}-${month < 10 ? '0' + month : month}-${day} ${hour}:${minutes}:${ss}`
-                    },
-                    success: res => {
-                      // 付钱
-                      this.$db.collection('userInfo').where({
-                        _openid: Megalo.getStorageSync('openid')
-                      }).update({
-                        data: {
-                          balance: nowBalance - this.totalMoney
-                        },
-                        success: _ => {
-                          wx.showToast({
-                            title: '支付成功',
-                            duration: 3000,
-                            success: _ => {
-                              // 生成账单
-                              this.$db.collection('billList').add({
-                                data: {
-                                  name: this.dataList.name,
-                                  isIncome: false,
-                                  price: '-' + this.totalMoney,
-                                  url: this.dataList.url[0],
-                                  time: `${month}月${day}日 ${hour}:${minutes}:${ss}`
-                                }
-                              })
-                              setTimeout(_ => {
-                                wx.navigateTo({
-                                  url: '/pages/mall/orderList'
-                                })
-                              }, 2000)
-                            }
-                          })
-                        }
-                      })
-                    }
-                  })
-                } else {
-                  console.log(nowBalance)
-                  wx.showToast({
-                    title: '很抱歉您的余额不足，请前往充值',
-                    icon: 'none',
-                    success: _ => {
-                      wx.navigateTo({
-                        url: '/pages/my/recharge'
-                      })
-                    }
-                  })
-                }
-              }
-            })
-          } else if (res.cancel) {
-            this.$db.collection('orderList').add({
-              data: {
-                name: this.dataList.name,
-                orderId: `2020${Math.ceil(Math.random() * 1000)}`,
-                orderStatus: '待付款',
-                orderType: 1,
-                count: this.goodsNum,
-                sName: this.sName,
-                sAddress: this.sAddress,
-                sPhone: this.sPhone,
-                sType: this.toHouse ? '送货上门' : '自提',
-                price: this.totalMoney,
-                url: this.dataList.url[0],
-                time: `${year}-${month}-${day} ${hour}:${minutes}:${ss}`
-              }
-            })
-            wx.showToast({
-              title: '支付失败，请尽快前往支付',
-              icon: 'none',
-              duration: 3000,
-              success: _ => {
-                setTimeout(_ => {
-                  wx.navigateTo({
-                    url: '/pages/mall/orderList'
-                  })
-                }, 2000)
-              }
-            })
+      if (!Megalo.getStorageSync('openid')) {
+        wx.showToast({
+          title: '您还没有登录，即将跳转到登录页面',
+          icon: 'none',
+          duration: 2500,
+          success: _ => {
+            setTimeout(_ => {
+              wx.switchTab({
+                url: '/pages/my/my'
+              })
+            }, 2000)
           }
-        }
-      })
+        })
+      } else {
+        wx.showModal({
+          content: `需要支付总金额为￥${this.totalMoney}`,
+          success: res => {
+            const date = new Date()
+            const year = date.getFullYear()
+            const month = (date.getMonth() + 1)
+            const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
+            const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
+            const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+            const ss = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
+            let nowBalance
+            if (res.confirm) {
+              this.$db.collection('userInfo').where({
+                _openid: Megalo.getStorageSync('openid')
+              }).get({
+                success: res => {
+                  nowBalance = res.data[0].balance
+                  if (nowBalance >= this.totalMoney) {
+                    // 生成订单
+                    this.$db.collection('orderList').add({
+                      data: {
+                        name: this.dataList.name,
+                        orderId: `2020${Math.ceil(Math.random() * 10000)}`,
+                        orderStatus: '已完成',
+                        orderType: 0,
+                        price: this.totalMoney,
+                        count: this.goodsNum,
+                        sName: this.sName,
+                        sAddress: this.sAddress,
+                        sPhone: this.sPhone,
+                        sType: this.toHouse ? '送货上门' : '自提',
+                        url: this.dataList.url[0],
+                        time: `${year}-${month < 10 ? '0' + month : month}-${day} ${hour}:${minutes}:${ss}`
+                      },
+                      success: res => {
+                        // 付钱
+                        this.$db.collection('userInfo').where({
+                          _openid: Megalo.getStorageSync('openid')
+                        }).update({
+                          data: {
+                            balance: nowBalance - this.totalMoney
+                          },
+                          success: _ => {
+                            wx.showToast({
+                              title: '支付成功',
+                              duration: 3000,
+                              success: _ => {
+                                // 生成账单
+                                this.$db.collection('billList').add({
+                                  data: {
+                                    name: this.dataList.name,
+                                    isIncome: false,
+                                    price: '-' + this.totalMoney,
+                                    url: this.dataList.url[0],
+                                    time: `${month}月${day}日 ${hour}:${minutes}:${ss}`
+                                  }
+                                })
+                                setTimeout(_ => {
+                                  wx.navigateTo({
+                                    url: '/pages/mall/orderList'
+                                  })
+                                }, 2000)
+                              }
+                            })
+                          }
+                        })
+                      }
+                    })
+                  } else {
+                    console.log(nowBalance)
+                    wx.showToast({
+                      title: '很抱歉您的余额不足，请前往充值',
+                      icon: 'none',
+                      success: _ => {
+                        wx.navigateTo({
+                          url: '/pages/my/recharge'
+                        })
+                      }
+                    })
+                  }
+                }
+              })
+            } else if (res.cancel) {
+              this.$db.collection('orderList').add({
+                data: {
+                  name: this.dataList.name,
+                  orderId: `2020${Math.ceil(Math.random() * 1000)}`,
+                  orderStatus: '待付款',
+                  orderType: 1,
+                  count: this.goodsNum,
+                  sName: this.sName,
+                  sAddress: this.sAddress,
+                  sPhone: this.sPhone,
+                  sType: this.toHouse ? '送货上门' : '自提',
+                  price: this.totalMoney,
+                  url: this.dataList.url[0],
+                  time: `${year}-${month}-${day} ${hour}:${minutes}:${ss}`
+                }
+              })
+              wx.showToast({
+                title: '支付失败，请尽快前往支付',
+                icon: 'none',
+                duration: 3000,
+                success: _ => {
+                  setTimeout(_ => {
+                    wx.navigateTo({
+                      url: '/pages/mall/orderList'
+                    })
+                  }, 2000)
+                }
+              })
+            }
+          }
+        })
+      }
     }
   },
   onLoad (options) {

@@ -10,38 +10,38 @@
       <div>不足半小时的按半小时计算，超过半小时的按一小时计算，请合理安排时间</div>
     </div>
     <div v-if="!isClosed" class="tables-wrap">
-      <scroll-view
+      <!-- <scroll-view
         style="height:1000rpx"
         scroll-y
-      >
-        <div class="scroll-wrap">
-          <div class="line_height1 mb_10 flex_column align_center" v-for="(item, index) in tableList" :key="index">
-            <div @click="item.isUsing = !item.isUsing" style="width:600rpx;height:300rpx;">
-              <img v-if="item.disable" style="width:100%;height:100%;" src="https://static.dingdandao.com/0ece7207a7eecd7361045572d97b08fb">
-              <img v-else style="width:100%;height:100%;" :src="item.isUsing ? 'https://static.dingdandao.com/df9f037eb9fcc2ae4ac8d6486d8241da' : 'https://static.dingdandao.com/2fd09d05fca5e2bb72a8e6c838a1511a'">
-            </div>
-            <div style="width:100%" class="my_20 justify_between align_center">
-              <div class="flex">
-                <div class="table-title">{{item.name}}</div>
-                <div class="table-title ml_20">￥{{item.price}}</div>
-              </div>
-              <div class="flex">
-                <div @click="useTable(item)" v-if="!item.disable" class="ml_10 t-button t-button-primary">开台</div>
-              </div>
-            </div>
-            <div v-if="item.startTime" style="width:100%" class="justify_between align_center">
-              <div class="flex">
-                <div class="table-title">开始时间：</div>
-                <div class="table-title">{{item.startTime.slice(5)}}</div>
-              </div>
-              <div @click="settleAccount(item)" class="t-button t-button-primary">结账</div>
-            </div>
-            <!-- <div class="flex"> -->
-              <!-- <button class="t-button mr_20" @click="toAppointment(item.id)">预约</button> -->
-            <!-- </div> -->
+      > -->
+      <div class="scroll-wrap">
+        <div class="line_height1 mb_10 flex_column align_center" v-for="(item, index) in tableList" :key="index">
+          <div @click="item.isUsing = !item.isUsing" style="width:600rpx;height:300rpx;">
+            <img v-if="item.disable" style="width:100%;height:100%;" src="https://static.dingdandao.com/0ece7207a7eecd7361045572d97b08fb">
+            <img v-else style="width:100%;height:100%;" :src="item.isUsing ? 'https://static.dingdandao.com/df9f037eb9fcc2ae4ac8d6486d8241da' : 'https://static.dingdandao.com/2fd09d05fca5e2bb72a8e6c838a1511a'">
           </div>
+          <div style="width:100%" class="my_20 justify_between align_center">
+            <div class="flex">
+              <div class="table-title">{{item.name}}</div>
+              <div class="table-title ml_20">￥{{item.price}}</div>
+            </div>
+            <div class="flex">
+              <div @click="useTable(item)" v-if="!item.disable" class="ml_10 t-button t-button-primary">开台</div>
+            </div>
+          </div>
+          <div v-if="item.startTime" style="width:100%" class="justify_between align_center">
+            <div class="flex">
+              <div class="table-title">开始时间：</div>
+              <div class="table-title">{{item.startTime.slice(5)}}</div>
+            </div>
+            <div @click="settleAccount(item)" class="t-button t-button-primary">结账</div>
+          </div>
+          <!-- <div class="flex"> -->
+            <!-- <button class="t-button mr_20" @click="toAppointment(item.id)">预约</button> -->
+          <!-- </div> -->
         </div>
-      </scroll-view>
+      </div>
+      <!-- </scroll-view> -->
     </div>
     <div style="background:#fff" class="h_100 align_center flex_column" v-else>
       <img style="width:260rpx;height:260rpx;margin-top:100rpx" src="https://static.dingdandao.com/4d102a263b12b46b4b981dd80d9f6602">
@@ -60,7 +60,7 @@ export default {
       totalMoney: undefined
     }
   },
-  onLoad () {
+  onShow () {
     this.getData()
     this.getStatus()
   },
@@ -69,14 +69,12 @@ export default {
       this.$db.collection('tables').get({
         success: res => {
           this.tableList = res.data
-          console.log(this.tableList)
         }
       })
     },
     getStatus () {
-      this.$db.collection('checkStatus').where({
-        _openid: Megalo.getStorageSync('openid')
-      }).get({
+      // 多商家可以加个字段来查询
+      this.$db.collection('checkStatus').get({
         success: res => {
           this.isClosed = res.data[0].isClosed
         }
@@ -90,30 +88,46 @@ export default {
       const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
       const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
       const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
-      this.$db.collection('tables').where({
-        _id: row._id
-      }).get({
-        success: res => {
-          usingStatus = res.data[0].isUsing
-          if (usingStatus) {
-            wx.showToast({
-              title: '该桌子正在使用中，请尝试其他桌子',
-              icon: 'none'
-            })
-          } else {
-            const startTime = `${year}-${month}-${day} ${hour}:${minutes}`
-            this.$db.collection('tables').where({
-              _id: row._id
-            }).update({
-              data: {
-                startTime: startTime,
-                isUsing: true
-              }
-            })
-            this.getData()
+      if (!Megalo.getStorageSync('openid')) {
+        wx.showToast({
+          title: '您还没有登录，即将跳转到登录页面',
+          icon: 'none',
+          duration: 2500,
+          success: _ => {
+            setTimeout(_ => {
+              wx.switchTab({
+                url: '/pages/my/my'
+              })
+            }, 2000)
           }
-        }
-      })
+        })
+      } else {
+        this.$db.collection('tables').where({
+          _id: row._id
+        }).get({
+          success: res => {
+            usingStatus = res.data[0].isUsing
+            if (usingStatus) {
+              wx.showToast({
+                title: '该桌子正在使用中，请尝试其他桌子',
+                icon: 'none'
+              })
+            } else {
+              const startTime = `${year}-${month}-${day} ${hour}:${minutes}`
+              console.log(startTime, 'st')
+              this.$db.collection('tables').where({
+                _id: row._id
+              }).update({
+                data: {
+                  startTime: startTime,
+                  isUsing: true
+                }
+              })
+              this.getData()
+            }
+          }
+        })
+      }
     },
     // toAppointment (id) {
     //   wx.navigateTo({
