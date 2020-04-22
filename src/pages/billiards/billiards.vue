@@ -216,7 +216,7 @@ export default {
                 })
                 setTimeout(_ => {
                   wx.reLaunch({ url: `/pages/billiards/billiardsDetail?startTime=${row.startTime}&endTime=${endTime}&totalMoney=${this.totalMoney}` })
-                }, 1500)
+                }, 1000)
               }
             })
           } else if (res.cancel) {
