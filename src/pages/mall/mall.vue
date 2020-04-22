@@ -56,7 +56,10 @@
             </div>
           </div>
           <movable-view direction="all" :x="x" :y="y">
-            <i class="icon_shoppingCar" />
+            <div @click="joinShoppingCar" style="width:80rpx" class="relative">
+              <i class="icon_shoppingCar" />
+              <div class="shopping-car-count">{{totalCount}}</div>
+            </div>
           </movable-view>
         </movable-area>
       </div>
@@ -69,11 +72,12 @@ export default {
   data () {
     return {
       x: 200,
-      y: 350,
+      y: 370,
       keyword: '',
       active: 0,
       currentRouter: '台球杆',
       advertingUrl: '',
+      totalCount: 0,
       routerList: [],
       goodsList: []
     }
@@ -87,6 +91,11 @@ export default {
         success: res => {
           this.goodsList = res.data
         }
+      })
+      db.collection('shoppingCar').where({
+        _openid: Megalo.getStorageSync('openid')
+      }).count().then(res => {
+        this.totalCount = res.total
       })
       // db.collection('mall').get({
       //   success: res => {
@@ -106,8 +115,12 @@ export default {
       this.active = ind
       this.getData()
     },
+    joinShoppingCar () {
+      wx.navigateTo({
+        url: '/pages/mall/shoppingCar'
+      })
+    },
     toGoodsDetail (val) {
-      console.log(1)
       wx.navigateTo({
         url: `/pages/mall/goodsDetail?goodsId=${val._id}`
       })
@@ -188,5 +201,19 @@ page {
       color: #fd7659;
     }
   }
+}
+.shopping-car-count {
+  border-radius: 50%;
+  background: crimson;
+  color: #fff;
+  width: 40rpx;
+  height: 40rpx;
+  font-size: 25rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: -10rpx;
+  left: 50rpx;
 }
 </style>

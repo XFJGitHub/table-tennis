@@ -120,7 +120,35 @@ export default {
       }
     },
     joinShoppingCar () {
-
+      if (!Megalo.getStorageSync('openid')) {
+        wx.showToast({
+          title: '您还没有登录，即将跳转到登录页面',
+          icon: 'none',
+          duration: 2500,
+          success: _ => {
+            setTimeout(_ => {
+              wx.switchTab({
+                url: '/pages/my/my'
+              })
+            }, 2000)
+          }
+        })
+      } else {
+        this.$db.collection('shoppingCar').add({
+          data: {
+            name: this.dataList.name,
+            price: this.dataList.price,
+            count: this.goodsNum,
+            url: this.dataList.url[0],
+            isClosed: false
+          },
+          success: _ => {
+            wx.showToast({
+              title: '加入购物车成功'
+            })
+          }
+        })
+      }
     },
     buy () {
       if (!Megalo.getStorageSync('openid')) {

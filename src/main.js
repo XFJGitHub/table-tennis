@@ -35,6 +35,7 @@ export default {
       'pages/video/video',
       'pages/video/articleDetail',
       'pages/mall/mall',
+      'pages/mall/shoppingCar',
       'pages/mall/goodsDetail',
       'pages/mall/orderList',
       'pages/mall/orderDetail',

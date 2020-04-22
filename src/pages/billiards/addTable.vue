@@ -24,6 +24,7 @@ export default {
         data: {
           disable: false,
           isUsing: false,
+          useName: '',
           name: this.tableName,
           price: this.tablePrice,
           startTime: ''

@@ -166,7 +166,7 @@
     width: 40rpx;
     height: 40rpx;
 }
-//报表
+//球桌管理
 .icon_tables {
     display: block;
     background-image: url('https://static.dingdandao.com/401727589284baf967274892f22d9262');
@@ -212,14 +212,24 @@
     background-image: url('https://static.dingdandao.com/dbfc31a407136586ebccf1b59ef76803');
     background-repeat: no-repeat;
     background-size: cover;
-    width: 40rpx;
-    height: 40rpx;
+    width: 30rpx;
+    height: 30rpx;
 }
 
 //垃圾桶
 .icon_delete {
     display: block;
     background-image: url('https://static.dingdandao.com/2be94df5e236bc449403fafd01184d51');
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 30rpx;
+    height: 30rpx;
+}
+
+//钩 √
+.icon_submit {
+    display: block;
+    background-image: url('https://static.dingdandao.com/9a74f2fa37e64678086086dcec640540');
     background-repeat: no-repeat;
     background-size: cover;
     width: 30rpx;
