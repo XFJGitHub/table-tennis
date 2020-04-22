@@ -1,7 +1,8 @@
 <config>
   {
     'navigationBarTitleText': '个人中心',
-    'navigationStyle': 'default'
+    'navigationStyle': 'default',
+    'enablePullDownRefresh': true
   }
 </config>
 <template>
@@ -125,7 +126,9 @@ export default {
       stopBusinessStatus: false
     }
   },
-  onLoad () {
+  onPullDownRefresh () {
+    this.getData()
+    wx.stopPullDownRefresh()
   },
   onShow () {
     this.getData()
@@ -150,35 +153,37 @@ export default {
     },
     // 获取用户信息
     getUserInfo (e) {
-      wx.cloud.callFunction({
-        name: 'demo',
-        complete: res => {
-          Megalo.setStorageSync('openid', res.result.openid)
-        }
-      })
       this.nickName = e.detail.userInfo.nickName
       this.avatarUrl = e.detail.userInfo.avatarUrl
       Megalo.setStorageSync('nickName', e.detail.userInfo.nickName)
       Megalo.setStorageSync('avatarUrl', e.detail.userInfo.avatarUrl)
-      var userExist = false
-      this.$db.collection('userInfo').get({
-        success: res => {
-          res.data.map(e => {
-            if (e._openid === Megalo.getStorageSync('openid')) {
-              userExist = true
-              this.getData()
+      wx.cloud.callFunction({
+        name: 'demo',
+        complete: res => {
+          Megalo.setStorageSync('openid', res.result.openid)
+        },
+        success: _ => {
+          var userExist = false
+          this.$db.collection('userInfo').get({
+            success: res => {
+              res.data.map(e => {
+                if (e._openid === Megalo.getStorageSync('openid')) {
+                  userExist = true
+                  this.getData()
+                }
+              })
+              if (userExist === false) {
+                this.$db.collection('userInfo').add({
+                  data: {
+                    nickName: this.nickName,
+                    avatarUrl: this.avatarUrl,
+                    balance: 0,
+                    isSeller: false
+                  }
+                })
+              }
             }
           })
-          if (userExist === false) {
-            this.$db.collection('userInfo').add({
-              data: {
-                nickName: this.nickName,
-                avatarUrl: this.avatarUrl,
-                balance: 0,
-                isSeller: false
-              }
-            })
-          }
         }
       })
     },

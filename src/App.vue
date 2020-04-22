@@ -2,6 +2,10 @@
 <script>
 export default {
   onLaunch (options) {
+    const systemInfo = wx.getSystemInfoSync()
+    if (systemInfo.model.includes('iPhone X' || 'iPhone XR' || 'iPhone 11')) {
+      Megalo.setStorageSync('iphoneX', true)
+    }
     // Do something initial when launch.
     // console.log('App onLaunch, env文件自定义的环境变量VUE_APP_TEST值:', process.env.VUE_APP_TEST)
   },

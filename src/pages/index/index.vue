@@ -1,7 +1,8 @@
 <config>
   {
     "usingComponents": {},
-    "navigationStyle": 'custom'
+    "navigationStyle": 'custom',
+    'enablePullDownRefresh': true
   }
 </config>
 <template>
@@ -119,6 +120,10 @@ export default {
         url: `/pages/mall/goodsDetail?goodsId=${val._id}`
       })
     }
+  },
+  onPullDownRefresh () {
+    this.getData()
+    wx.stopPullDownRefresh()
   },
   onLoad () {
     this.getData()

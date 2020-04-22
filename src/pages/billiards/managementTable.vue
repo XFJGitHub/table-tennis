@@ -1,6 +1,7 @@
 <config>
   {
-    'navigationBarTitleText': '管理球桌'
+    'navigationBarTitleText': '管理球桌',
+    'enablePullDownRefresh': true
   }
 </config>
 <template>
@@ -18,7 +19,7 @@
           <div v-else style="width:200rpx" class="text-ellipsis">{{item.name}}</div>
           <input type="text" placeholder="输入价格" style="width:170rpx" v-if="isEdit && tableId === item._id" v-model="tablePrice">
           <div v-else style="width:170rpx">{{item.price}}</div>
-          <switch style="width:180rpx;zoom:.8" :checked="item.status" @change="changeStatus"/>
+          <switch style="width:180rpx;zoom:.8" :checked="item.disable" @change="changeStatus(item)"/>
         </div>
         <div class="flex">
           <i @click="submitTable(item._id)" v-if="isEdit && tableId === item._id" class="icon_submit" />
@@ -46,6 +47,10 @@ export default {
       tablePrice: ''
     }
   },
+  onPullDownRefresh () {
+    this.getData()
+    wx.stopPullDownRefresh()
+  },
   onLoad () {
     this.getData()
   },
@@ -54,6 +59,15 @@ export default {
       this.$db.collection('tables').get({
         success: res => {
           this.tableList = res.data
+        }
+      })
+    },
+    changeStatus (row) {
+      this.$db.collection('tables').where({
+        _id: row._id
+      }).update({
+        data: {
+          disable: !row.disable
         }
       })
     },

@@ -136,8 +136,10 @@ export default {
     //   })
     // }
   },
-  onLoad () {
+  onShow () {
     this.getData()
+  },
+  onLoad () {
     this.getRouterList()
   }
 }

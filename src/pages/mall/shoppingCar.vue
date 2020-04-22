@@ -1,3 +1,8 @@
+<config>
+  {
+    'enablePullDownRefresh': true
+  }
+</config>
 <template>
   <div class="shopping-car-wrap">
     <div v-if="dataList.length > 0">
@@ -33,7 +38,7 @@
           </div>
         </div>
       </div>
-      <div class="shoppign-car-bottom">
+      <div class="shoppign-car-bottom" :style="{ 'padding-bottom': isX ? '160rpx' : ''}">
         <div class="flex align_center" @click="checkedAll">
           <radio :checked="checkAll" color="#ff4e00" style="zoom:.8"/>
           <span class="fontsize_26">全选</span>
@@ -55,13 +60,18 @@
 export default {
   data () {
     return {
+      isX: Megalo.getStorageSync('iphoneX'),
       checkAll: false,
       dataList: [],
       totalCount: undefined,
       totalPrice: 0
     }
   },
-  onLoad () {
+  onPullDownRefresh () {
+    this.getData()
+    wx.stopPullDownRefresh()
+  },
+  onShow () {
     this.getData()
     this.getCount()
   },

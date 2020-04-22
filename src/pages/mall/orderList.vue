@@ -1,6 +1,7 @@
 <config>
   {
-    'navigationBarTitleText': '订单列表'
+    'navigationBarTitleText': '订单列表',
+    'enablePullDownRefresh': true
   }
 </config>
 <template>
@@ -75,6 +76,10 @@ export default {
         url: `/pages/mall/orderDetail?_id=${id}`
       })
     }
+  },
+  onPullDownRefresh () {
+    this.getData()
+    wx.stopPullDownRefresh()
   },
   onLoad () {
     this.getData()

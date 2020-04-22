@@ -35,7 +35,7 @@ export default {
   methods: {
     submit () {
       wx.switchTab({
-        url: '/pages/index/index'
+        url: '/pages/billiards/billiards'
       })
     }
   }

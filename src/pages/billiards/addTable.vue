@@ -34,7 +34,14 @@ export default {
             title: '添加成功',
             success: _ => {
               wx.navigateTo({
-                url: '/pages/billiards/managementTable'
+                url: '/pages/billiards/managementTable',
+                success: _ => {
+                  setTimeout(_ => {
+                    wx.navigateBack({
+                      delta: 2
+                    }, 1500)
+                  })
+                }
               })
             }
           })

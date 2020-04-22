@@ -1,6 +1,7 @@
 <config>
   {
-    'navigationBarTitleText': '娱乐中心'
+    'navigationBarTitleText': '娱乐中心',
+    'enablePullDownRefresh': true
   }
 </config>
 <template>
@@ -59,6 +60,10 @@ export default {
       isUsing: false,
       totalMoney: undefined
     }
+  },
+  onPullDownRefresh () {
+    this.getData()
+    wx.stopPullDownRefresh()
   },
   onShow () {
     this.getData()
@@ -121,9 +126,11 @@ export default {
                 data: {
                   startTime: startTime,
                   isUsing: true
+                },
+                success: _ => {
+                  this.getData()
                 }
               })
-              this.getData()
             }
           }
         })
@@ -136,18 +143,20 @@ export default {
     // },
     // 生成账单
     setBills (startTime, endTime, month, day, hour, minutes, ss, balance) {
-      this.$db.collection('billList').add({
-        data: {
-          isIncome: false,
-          name: '付款给EGE Clube',
-          price: '-' + this.totalMoney,
-          balance: balance,
-          time: `${month}月${day}日 ${hour}:${minutes}:${ss}`,
-          startTime: startTime,
-          endTime: endTime,
-          url: 'https://static.dingdandao.com/0daecc4ad851a61763ada65c727212ff'
-        }
-      })
+      if (this.totalMoney !== 0) {
+        this.$db.collection('billList').add({
+          data: {
+            isIncome: false,
+            name: '付款给EGE Clube',
+            price: '-' + this.totalMoney,
+            balance: balance,
+            time: `${month}月${day}日 ${hour}:${minutes}:${ss}`,
+            startTime: startTime,
+            endTime: endTime,
+            url: 'https://static.dingdandao.com/0daecc4ad851a61763ada65c727212ff'
+          }
+        })
+      }
     },
     settleAccount (row) {
       console.log(row)
@@ -207,7 +216,7 @@ export default {
                 })
                 setTimeout(_ => {
                   wx.reLaunch({ url: `/pages/billiards/billiardsDetail?startTime=${row.startTime}&endTime=${endTime}&totalMoney=${this.totalMoney}` })
-                }, 2000)
+                }, 1500)
               }
             })
           } else if (res.cancel) {

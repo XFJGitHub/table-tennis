@@ -1,6 +1,7 @@
 <config>
   {
-    "navigationBarTitleText": '账单'
+    "navigationBarTitleText": '账单',
+    'enablePullDownRefresh': true
   }
 </config>
 <template>
@@ -57,6 +58,10 @@ export default {
         url: `/pages/my/billDetail?id=${row._id}`
       })
     }
+  },
+  onPullDownRefresh () {
+    this.getData()
+    wx.stopPullDownRefresh()
   },
   onLoad () {
     this.getData()
