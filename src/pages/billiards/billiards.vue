@@ -149,7 +149,6 @@ export default {
             isIncome: false,
             name: '付款给EGE Clube',
             price: '-' + this.totalMoney,
-            balance: balance,
             time: `${month}月${day}日 ${hour}:${minutes}:${ss}`,
             startTime: startTime,
             endTime: endTime,
@@ -157,6 +156,18 @@ export default {
           }
         })
       }
+    },
+    // 生成使用情况
+    setUsingInfo (row, tableHour, totalMoney) {
+      this.$db.collection('tableUsing').add({
+        data: {
+          day: row.startTime.slice(5, 10),
+          time: row.startTime.slice(11),
+          name: row.name,
+          usingHours: tableHour,
+          totalMoney: totalMoney
+        }
+      })
     },
     settleAccount (row) {
       console.log(row)
@@ -204,7 +215,6 @@ export default {
                 }).get({
                   success: res => {
                     nowBalance = res.data[0].balance
-                    this.setBills(row.startTime, endTime, month, day, hour, minutes, ss, nowBalance)
                     this.$db.collection('userInfo').where({
                       _openid: Megalo.getStorageSync('openid')
                     }).update({
@@ -212,11 +222,13 @@ export default {
                         balance: nowBalance - this.totalMoney
                       }
                     })
+                    this.setUsingInfo(row, tableHour, this.totalMoney)
+                    this.setBills(row.startTime, endTime, month, day, hour, minutes, ss)
+                    setTimeout(_ => {
+                      wx.reLaunch({ url: `/pages/billiards/billiardsDetail?startTime=${row.startTime}&endTime=${endTime}&totalMoney=${this.totalMoney}` })
+                    }, 1000)
                   }
                 })
-                setTimeout(_ => {
-                  wx.reLaunch({ url: `/pages/billiards/billiardsDetail?startTime=${row.startTime}&endTime=${endTime}&totalMoney=${this.totalMoney}` })
-                }, 1000)
               }
             })
           } else if (res.cancel) {
