@@ -3,11 +3,9 @@ import Vue from 'vue'
 import VHtmlPlugin from '@megalo/vhtml-plugin'
 import Vuex from 'vuex'
 import '@/static/styles/common.scss'
-import Button from 'vant/lib/button'
-import 'vant/lib/button/style'
+
 Vue.use(VHtmlPlugin)
 Vue.use(Vuex)
-Vue.use(Button)
 
 const store = require('./store').default
 Vue.prototype.$store = store
@@ -44,6 +42,7 @@ export default {
       'pages/my/recharge',
       'pages/my/bill',
       'pages/my/billDetail',
+      'pages/my/reports',
       'pages/my/setting'
     ],
     tabBar: {
