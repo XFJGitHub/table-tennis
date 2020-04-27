@@ -49,7 +49,7 @@
         <div class="icon-text-wrap">
           <div class="icon-text">余额</div>
           <div class="flex align_center">
-            <div class="color_156">{{balance}}.00元</div>
+            <div class="color_156">{{balance.toFixed(2)}}元</div>
           </div>
         </div>
       </div>

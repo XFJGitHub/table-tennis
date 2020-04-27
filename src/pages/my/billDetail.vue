@@ -5,7 +5,7 @@
         <img class="detail-img" :src="dataList.url">
       </div>
       <div class="my_20">{{dataList.name}}</div>
-      <div class="font_bold fontsize_40">{{dataList.price}}.00</div>
+      <div class="font_bold fontsize_40">{{dataList.price.toFixed(2)}}</div>
     </div>
 
     <template>

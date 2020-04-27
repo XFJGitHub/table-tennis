@@ -1,7 +1,10 @@
 <template>
   <div>
     <div class="flex border_bottom p_20">
-      球桌名:<input class="ml_10" placeholder="请输入添加的球桌名" type="text" v-model="tableName">
+      球桌品牌:<input class="ml_10" placeholder="请输入添加的球桌品牌" type="text" v-model="tableBrand">
+    </div>
+    <div class="flex border_bottom p_20">
+      球桌编号:<input class="ml_10" placeholder="请输入添加的球桌编号" type="text" v-model="tableName">
     </div>
     <div class="flex border_bottom p_20">
       球桌价格:<input class="ml_10" placeholder="请输入添加的球桌价格" type="number" v-model="tablePrice">
@@ -14,39 +17,43 @@
 export default {
   data () {
     return {
+      tableBrand: '',
       tableName: '',
       tablePrice: ''
     }
   },
   methods: {
     submit () {
-      this.$db.collection('tables').add({
-        data: {
-          disable: false,
-          isUsing: false,
-          useName: '',
-          name: this.tableName,
-          price: this.tablePrice,
-          startTime: ''
-        },
-        success: _ => {
-          wx.showToast({
-            title: '添加成功',
-            success: _ => {
-              wx.navigateTo({
-                url: '/pages/billiards/managementTable',
-                success: _ => {
-                  setTimeout(_ => {
-                    wx.navigateBack({
-                      delta: 2
-                    }, 1500)
-                  })
-                }
-              })
-            }
-          })
-        }
-      })
+      if (this.tableBrand && this.tableName && this.tablePrice) {
+        this.$db.collection('tables').add({
+          data: {
+            disable: false,
+            isUsing: false,
+            useName: '',
+            brand: this.tableBrand,
+            name: this.tableName,
+            price: this.tablePrice,
+            startTime: ''
+          },
+          success: _ => {
+            wx.showToast({
+              title: '添加成功',
+              success: _ => {
+                wx.navigateTo({
+                  url: '/pages/billiards/managementTable',
+                  success: _ => {
+                    setTimeout(_ => {
+                      wx.navigateBack({
+                        delta: 2
+                      }, 1500)
+                    })
+                  }
+                })
+              }
+            })
+          }
+        })
+      }
     }
   }
 }

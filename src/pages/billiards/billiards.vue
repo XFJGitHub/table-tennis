@@ -148,7 +148,8 @@ export default {
           data: {
             isIncome: false,
             name: '付款给EGE Clube',
-            price: '-' + this.totalMoney,
+            _type: 'billiard',
+            price: this.totalMoney,
             time: `${month}月${day}日 ${hour}:${minutes}:${ss}`,
             startTime: startTime,
             endTime: endTime,
@@ -163,7 +164,9 @@ export default {
         data: {
           day: row.startTime.slice(5, 10),
           time: row.startTime.slice(11),
+          timeStamp: new Date(row.startTime.slice(5, 10)).getTime(),
           name: row.name,
+          brand: row.brand,
           usingHours: tableHour,
           totalMoney: totalMoney
         }
@@ -224,9 +227,9 @@ export default {
                     })
                     this.setUsingInfo(row, tableHour, this.totalMoney)
                     this.setBills(row.startTime, endTime, month, day, hour, minutes, ss)
-                    setTimeout(_ => {
-                      wx.reLaunch({ url: `/pages/billiards/billiardsDetail?startTime=${row.startTime}&endTime=${endTime}&totalMoney=${this.totalMoney}` })
-                    }, 1000)
+                    // setTimeout(_ => {
+                    wx.reLaunch({ url: `/pages/billiards/billiardsDetail?startTime=${row.startTime}&endTime=${endTime}&totalMoney=${this.totalMoney}` })
+                    // }, 1000)
                   }
                 })
               }

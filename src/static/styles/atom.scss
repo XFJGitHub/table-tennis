@@ -5,6 +5,10 @@
 .border_bottom {
     border-bottom: 1px solid #e5e5e5;
 }
+
+.border_right {
+    border-right: 1px solid #e5e5e5;
+}
 /*====flex====*/
 .border_box {
     -webkit-box-sizing: border-box;
@@ -746,6 +750,10 @@
 
 .mx_40 {
     margin:0  40rpx;
+}
+
+.mx_20 {
+    margin:0  20rpx;
 }
 
 .py_20 {

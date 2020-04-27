@@ -42,7 +42,9 @@ export default {
       'pages/my/recharge',
       'pages/my/bill',
       'pages/my/billDetail',
-      'pages/my/reports',
+      'pages/my/report/allIncome',
+      'pages/my/report/everyDayIncome',
+      'pages/my/report/dayUsingInfo',
       'pages/my/setting'
     ],
     tabBar: {

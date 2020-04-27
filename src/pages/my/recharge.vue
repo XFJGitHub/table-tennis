@@ -45,7 +45,8 @@ export default {
                 data: {
                   name: `充值余额`,
                   isIncome: true,
-                  price: '+' + this.rechargeNum,
+                  _type: 'recharge',
+                  price: this.rechargeNum,
                   url: 'https://static.dingdandao.com/da4beb15dab1194cc20efefb6ba0d2fe',
                   time: `${month}月${day}日 ${hour}:${minutes}`
                 }

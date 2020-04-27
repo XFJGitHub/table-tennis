@@ -3,6 +3,14 @@
 @import './index.scss';
 @import './color.scss';
 
+.cardNew-title {
+    color: #475669;
+    padding: 20rpx;
+    font-weight: 700;
+    border-bottom: 1px solid #e1e7f0;
+    border-top: 1px solid #e1e7f0;
+}
+
 .suc-btn {
     position: fixed;
     bottom: 80rpx;

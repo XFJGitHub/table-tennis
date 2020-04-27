@@ -8,7 +8,7 @@
 <div class="bill-wrap flex_column align_center">
   <i class="icon_wechatPay"></i>
   <div class="title-text">支付成功</div>
-  <div class="bill-money"><span class="fontsize_40">￥</span>{{totalMoney}}.00</div>
+  <div class="bill-money"><span class="fontsize_40">￥</span>{{totalMoney.toFixed(2)}}</div>
   <div class="color_464 fontsize_28">收款方：</div>
     <img class="mt_20" style="border-radius:10rpx;width:160rpx;height:112rpx;border:1px solid #e5e5e5" src="https://static.dingdandao.com/0daecc4ad851a61763ada65c727212ff">
   <div class="mt_20 mb_20">EGE clube</div>

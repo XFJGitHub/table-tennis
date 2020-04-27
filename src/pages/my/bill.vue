@@ -20,7 +20,7 @@
             <div style="width:450rpx" class="text-ellipsis">{{item.name}}</div>
             <div class="mt_20 fontsize_24 color_156">{{item.time}}</div>
           </div>
-          <div :style="{color: item.isIncome ? '#CD853F' : ''}">{{item.price}}</div>
+          <div :style="{color: item.isIncome ? '#CD853F' : ''}">{{item.isIncome === true ? '+' : '-'}}{{item.price}}</div>
         </div>
       </div>
     </template>

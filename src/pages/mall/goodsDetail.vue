@@ -217,7 +217,8 @@ export default {
                                   data: {
                                     name: this.dataList.name,
                                     isIncome: false,
-                                    price: '-' + this.totalMoney,
+                                    _type: 'goods',
+                                    price: this.totalMoney,
                                     url: this.dataList.url[0],
                                     time: `${month}月${day}日 ${hour}:${minutes}:${ss}`
                                   }
