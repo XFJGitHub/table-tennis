@@ -33,6 +33,8 @@ export default {
       'pages/video/video',
       'pages/video/articleDetail',
       'pages/mall/mall',
+      'pages/mall/managementGoods',
+      'pages/mall/addGoods',
       'pages/mall/shoppingCar',
       'pages/mall/goodsDetail',
       'pages/mall/orderList',

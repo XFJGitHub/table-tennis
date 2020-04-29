@@ -81,7 +81,7 @@ export default {
     this.getData()
     wx.stopPullDownRefresh()
   },
-  onLoad () {
+  onShow () {
     this.getData()
   }
 }

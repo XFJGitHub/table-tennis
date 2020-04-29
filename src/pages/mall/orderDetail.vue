@@ -88,8 +88,8 @@ export default {
         _id: this.goods._id
       }).remove({
         success: res => {
-          wx.navigateTo({
-            url: '/pages/mall/orderList'
+          wx.navigateBack({
+            delta: 1
           })
         }
       })

@@ -176,6 +176,16 @@
     height: 40rpx;
 }
 
+//商品管理
+.icon_goods {
+    display: block;
+    background-image: url('https://static.dingdandao.com/2ff0152648ffac08dab41bba692584fc');
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 40rpx;
+    height: 40rpx;
+}
+
 //暂停营业
 .icon_open {
     display: block;
@@ -234,6 +244,16 @@
     background-size: cover;
     width: 30rpx;
     height: 30rpx;
+}
+
+//取消
+.icon_cancel {
+    display: block;
+    background-image: url('https://static.dingdandao.com/1fd3f801a40601e5649eba9ba7d13a11');
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 40rpx;
+    height: 40rpx;
 }
 
 //weChat Pay

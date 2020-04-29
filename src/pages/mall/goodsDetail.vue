@@ -269,7 +269,7 @@ export default {
                 icon: 'none',
                 success: _ => {
                   setTimeout(_ => {
-                    wx.navigateTo({
+                    wx.redirectTo({
                       url: '/pages/mall/orderList'
                     })
                   }, 1000)

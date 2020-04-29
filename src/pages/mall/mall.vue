@@ -36,7 +36,7 @@
           {{item.name}}
         </div>
       </div>
-      <div class="right-content relative">
+      <div v-if="goodsList.length > 0" class="right-content relative">
         <movable-area class="w_100 h_100">
           <div
             class="flex ml_20 mb_20"
@@ -63,6 +63,10 @@
           </movable-view>
         </movable-area>
       </div>
+      <div class="align_center flex_column" style="margin-left:140rpx;" v-else>
+        <img style="margin-top: 200rpx;width: 280rpx;height:200rpx" src="https://static.dingdandao.com/612007ba2dc43b5c6646f19fe54a4206">
+        <div style="color: #a3b1bf" class="mt_20 fontsize_26">暂无商品</div>
+      </div>
     </div>
   </div>
 </template>
@@ -75,7 +79,7 @@ export default {
       y: 370,
       keyword: '',
       active: 0,
-      currentRouter: '台球杆',
+      currentRouter: '',
       advertingUrl: '',
       totalCount: 0,
       routerList: [],
@@ -107,6 +111,8 @@ export default {
       this.$db.collection('routerList').get({
         success: res => {
           this.routerList = res.data
+          this.currentRouter = res.data[0].name
+          this.getData()
         }
       })
     },
@@ -137,9 +143,6 @@ export default {
     // }
   },
   onShow () {
-    this.getData()
-  },
-  onLoad () {
     this.getRouterList()
   }
 }

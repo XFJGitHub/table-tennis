@@ -103,6 +103,13 @@
             <i class="icon_right" />
           </div>
         </div>
+        <div class="flex align_center" @click="toOtherPages(2)">
+          <i class="icon_goods m_20" />
+          <div class="icon-text-wrap">
+            <div class="icon-text">商品管理</div>
+            <i class="icon_right" />
+          </div>
+        </div>
         <div class="flex align_center">
           <i class="icon_open m_20" />
           <div class="icon-text-wrap" style="border:none">
@@ -223,7 +230,8 @@ export default {
       const url = {
         '-1': '/pages/my/setting',
         0: '/pages/my/report',
-        1: '/pages/billiards/managementTable'
+        1: '/pages/billiards/managementTable',
+        2: '/pages/mall/managementGoods'
       }
       wx.navigateTo({
         url: url[num]
