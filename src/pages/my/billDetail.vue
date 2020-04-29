@@ -5,7 +5,7 @@
         <img class="detail-img" :src="dataList.url">
       </div>
       <div class="my_20">{{dataList.name}}</div>
-      <div class="font_bold fontsize_40">{{dataList.price.toFixed(2)}}</div>
+      <div class="font_bold fontsize_40">{{dataList.price}}</div>
     </div>
 
     <template>
@@ -48,6 +48,7 @@ export default {
     }).get({
       success: res => {
         this.dataList = res.data[0]
+        this.dataList.price = this.dataList.price.toFixed(2)
       }
     })
   }

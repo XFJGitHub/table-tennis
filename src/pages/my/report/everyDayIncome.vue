@@ -30,8 +30,14 @@
     <div class="cardNew-title">
       球桌每日收入
     </div>
-    <div class="mt_20">
-      <canvas canvas-id="lineCanvas1" disable-scroll="false" style="width:100%;height:300px"></canvas>
+    <div class="mt_40">
+      <canvas canvas-id="lineCanvas1" disable-scroll="false" style="width:100%;height:200px"></canvas>
+    </div>
+    <div class="cardNew-title">
+      球桌每日使用次数
+    </div>
+    <div class="mt_40">
+      <canvas canvas-id="lineCanvas2" disable-scroll="false" style="width:100%;height:200px"></canvas>
     </div>
   </div>
 </template>
@@ -53,12 +59,12 @@ export default {
       endDate: '',
     }
   },
-  onShow() {
+  onShow () {
       const date = new Date()
       const month = (date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
       const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
       this.startDayIndex = [month - 1, day -1]
-      this.startDate =  month + '-' + day
+      this.startDate =  month + '-' + (day - 6)
       this.start7end()
       this.computerXdate()
       this.getData()
@@ -79,64 +85,100 @@ export default {
       }).end().then(res => {
         console.log(res.list)
         //组合charts可以渲染的数组
-        var objData = {
-          0: {
-            price: [],
-            count: [],
-            name: ''
+        const newArray = []
+        let brandList = []
+        res.list.map(e => {
+          const brand = e._id.brand
+          if (!~brandList.indexOf(brand)) {
+              brandList.push(brand)
           }
-        }
-
-        // let brandList = []
-        // res.list.map(e => {
-        //   objData[e._id.brand] = {}
-        //   objData[e._id.brand].price = []
-        //   objData[e._id.brand].count = []
-        //   objData[e._id.brand].name = e._id.brand
-        //   for(let i = 0;i < this.dateArray.length;i++) {
-        //     if (this.dateArray[i] === e._id.date) {
-        //       objData[e._id.brand].price[i] = e.totalPrice
-        //       objData[e._id.brand].count[i] = e.totalCount
-        //     } else {
-        //         objData[e._id.brand].price[i] = null
-        //         objData[e._id.brand].count[i] = null
-        //     }
-        //   }
-        // })
-        // 动态生成series
-        let seriesData = []
-        for(let key in objData) {
-          seriesData.push({
-            name: objData[key].name,
-            data: objData[key].price,
-            format: function (val, name) {
-                return '￥' + val.toFixed(2);
+        })
+        brandList.map(brand => {
+          const price = []
+          const count = []
+          this.dateArray.map(_ => {
+            price.push(0)
+            count.push(0)
+          })
+          res.list.map(e => {
+            const index = this.dateArray.indexOf(e._id.date)
+            if (e._id.brand === brand) {
+                price[index] = e.totalPrice
+                count[index] = e.totalCount
             }
           })
+          newArray.push({
+            name: brand,
+            price: price,
+            count: count
+          })
+        })
+        // console.log(newArray)
+
+        // 动态生成series
+        let seriesPriceData = []
+        let seriesCountData = []
+        for(let i = 0;i < newArray.length; i++) {
+          seriesPriceData.push({
+            name: newArray[i].name,
+            data: newArray[i].price
+          })
+          seriesCountData.push({
+            name: newArray[i].name,
+            data: newArray[i].count
+          })
         }
-        console.log(seriesData, 'series')
-        // brandList = brandList.concat(Object.keys(objData))
-        console.log(objData, 'obj')
-        // console.log(brandList, 2)
-        new wxCharts({
+        var lineChart1 = null;
+        var lineChart2 = null;
+        var windowWidth = 320
+        try {
+          var res = wx.getSystemInfoSync()
+            windowWidth = res.windowWidth
+        } catch (e) {
+          console.error('getSystemInfoSync failed!')
+        }
+        // 每日收入
+        lineChart1 = new wxCharts({
           canvasId: 'lineCanvas1',
           type: 'line',
           categories: this.dateArray,
           animation: true,
-          series: seriesData,
+          series: seriesPriceData,
           xAxis: {
               disableGrid: true
           },
           yAxis: {
-              format: function (val) {
-                  return '￥' + val.toFixed(2);
-              }
+            format: function (val) {
+                return '￥' + val.toFixed(2);
+            }
           },
-          width: 350,
+          width: windowWidth,
           height: 200,
           // dataLabel: false,
           extra: {
-              lineStyle: 'curve'
+            lineStyle: 'curve'
+          }
+        });
+        // 使用次数
+        lineChart2 = new wxCharts({
+          canvasId: 'lineCanvas2',
+          type: 'line',
+          categories: this.dateArray,
+          animation: true,
+          series: seriesCountData,
+          xAxis: {
+              disableGrid: true
+          },
+          yAxis: {
+            format: function (val) {
+              return val + '次';
+            },
+            min: 0
+          },
+          width: windowWidth,
+          height: 200,
+          extra: {
+            lineStyle: 'curve'
           }
         });
       })

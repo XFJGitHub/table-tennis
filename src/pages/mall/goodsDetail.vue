@@ -155,13 +155,12 @@ export default {
         wx.showToast({
           title: '您还没有登录，即将跳转到登录页面',
           icon: 'none',
-          duration: 2500,
           success: _ => {
             setTimeout(_ => {
               wx.switchTab({
                 url: '/pages/my/my'
               })
-            }, 2000)
+            }, 1500)
           }
         })
       } else {
@@ -268,13 +267,12 @@ export default {
               wx.showToast({
                 title: '支付失败，请尽快前往支付',
                 icon: 'none',
-                duration: 3000,
                 success: _ => {
                   setTimeout(_ => {
                     wx.navigateTo({
                       url: '/pages/mall/orderList'
                     })
-                  }, 2000)
+                  }, 1000)
                 }
               })
             }

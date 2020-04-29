@@ -127,12 +127,12 @@ export default {
   },
   onLoad () {
     this.getData()
-    wx.cloud.callFunction({
-      name: 'demo',
-      complete: res => {
-        Megalo.setStorageSync('openid', res.result.openid)
-      }
-    })
+    // wx.cloud.callFunction({
+    //   name: 'demo',
+    //   complete: res => {
+    //     Megalo.setStorageSync('openid', res.result.openid)
+    //   }
+    // })
   }
 }
 </script>

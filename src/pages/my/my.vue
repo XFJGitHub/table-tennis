@@ -11,10 +11,10 @@
       <div style="width: 130rpx;height:130rpx">
         <!-- <img v-if="avatarUrl" style="width:100%;height:100%;border-radius: 30rpx;" :src="avatarUrl">
         <img v-else style="width:100%;height:100%;border-radius: 30rpx;" src="https://static.dingdandao.com//ueditor/upload/image/20190822/1566461822343050529.png"> -->
-        <img style="width:100%;height:100%;border-radius: 30rpx;" :src="avatarUrl ? avatarUrl : 'https://static.dingdandao.com//ueditor/upload/image/20190822/1566461822343050529.png'">
+        <img style="width:100%;height:100%;border-radius: 30rpx;" :src="isLogin ? avatarUrl : 'https://static.dingdandao.com//ueditor/upload/image/20190822/1566461822343050529.png'">
       </div>
       <div class="ml_40">
-        <div v-if="!nickName">
+        <div v-if="!isLogin">
           <button hover-class="none" class="button-noclass" open-type="getUserInfo" lang="zh_CN" @getuserinfo="getUserInfo">点击登录显示微信头像</button>
           <div class="mt_30 fontsize_30 color_156">游客</div>
         </div>
@@ -79,7 +79,7 @@
     </div>
 
     <div class="my-body">
-      <div class="flex align_center">
+      <div class="flex align_center" @click="toOtherPages(-1)">
         <i class="icon_setting m_20" />
         <div class="icon-text-wrap" style="border:none">
           <div class="icon-text">设置</div>
@@ -87,7 +87,7 @@
         </div>
       </div>
     </div>
-    <div v-if="isSeller">
+    <div v-if="isSeller && isLogin">
       <div class="my-body">
         <div class="flex align_center" @click="toOtherPages(0)">
           <i class="icon_reports m_20" />
@@ -123,6 +123,7 @@ export default {
       nickName: Megalo.getStorageSync('nickName'),
       balance: 0,
       isSeller: false,
+      isLogin: false,
       stopBusinessStatus: false
     }
   },
@@ -135,7 +136,8 @@ export default {
   },
   methods: {
     getData () {
-      if (this.nickName) {
+      this.isLogin = Megalo.getStorageSync('openid')
+      if (this.isLogin) {
         this.$db.collection('userInfo').where({
           _openid: Megalo.getStorageSync('openid')
         }).get({
@@ -219,14 +221,12 @@ export default {
     },
     toOtherPages (num) {
       const url = {
-        0: '',
+        '-1': '/pages/my/setting',
+        0: '/pages/my/report',
         1: '/pages/billiards/managementTable'
       }
       wx.navigateTo({
-        url: url[num],
-        fail: err => {
-          console.log(err)
-        }
+        url: url[num]
       })
     },
     // 暂停营业

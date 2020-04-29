@@ -51,7 +51,7 @@
               <div style="width: 300rpx;" class="text-ellipsis">{{ite.goodsDetail.name}}</div>
               <div v-if="ite.goodsDetail.tags !== 0" class="goods-tags">包邮</div>
               <div class="goods-price">
-                ￥<span class="fontsize_40">{{ite.goodsDetail.price.toFixed(2)}}</span>
+                ￥<span class="fontsize_40">{{ite.goodsDetail.price}}</span>
               </div>
             </div>
           </div>

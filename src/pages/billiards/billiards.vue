@@ -160,6 +160,8 @@ export default {
     },
     // 生成使用情况
     setUsingInfo (row, tableHour, totalMoney) {
+      console.log(row.startTime.slice(5, 10), 'mp')
+      console.log(new Date(row.startTime.slice(5, 10)).getTime(), 'timeStamp')
       this.$db.collection('tableUsing').add({
         data: {
           day: row.startTime.slice(5, 10),
@@ -173,51 +175,71 @@ export default {
       })
     },
     settleAccount (row) {
-      console.log(row)
-      const date = new Date()
-      const year = date.getFullYear()
-      const month = (date.getMonth() + 1)
-      const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
-      const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
-      const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
-      const ss = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
-      const endTime = `${year}-${month < 10 ? '0' + month : month}-${day} ${hour}:${minutes}`
-      const diffSeconds = (new Date(endTime).getTime()) - (new Date(row.startTime).getTime())
-      const tableHour = Math.floor(diffSeconds / 1000 / 3600)
-      const tableMinute = diffSeconds / 1000 / 60 % 60
-      console.log(endTime, 'en')
-      console.log(tableHour, 'h')
-      console.log(tableMinute, 'm')
-      if (tableMinute < 30 && tableMinute > 0) {
-        this.totalMoney = (tableHour + 0.5) * row.price
-      } else if (tableMinute === 0 && tableMinute === 0) {
-        this.totalMoney = 0
+      if (!Megalo.getStorageSync('openid')) {
+        wx.showToast({
+          title: '您没有登录不能支付',
+          icon: 'none',
+          duration: 2500,
+          success: _ => {
+            setTimeout(_ => {
+              wx.switchTab({
+                url: '/pages/my/my'
+              })
+            }, 2000)
+          }
+        })
       } else {
-        this.totalMoney = (tableHour + 1) * row.price
-      }
-      wx.showModal({
-        title: '消费金额',
-        content: `您消费时间共${tableHour}小时${tableMinute < 10 ? '0' + tableMinute : tableMinute}分，消费金额为${this.totalMoney}元`,
-        success: res => {
-          let nowBalance
-          if (res.confirm) {
-            wx.showToast({
-              title: '支付成功',
-              icon: 'none',
-              success: _ => {
-                this.$db.collection('tables').where({
-                  _id: row._id
-                }).update({
-                  data: {
-                    startTime: '',
-                    isUsing: false
-                  }
-                })
-                this.$db.collection('userInfo').where({
-                  _openid: Megalo.getStorageSync('openid')
-                }).get({
-                  success: res => {
-                    nowBalance = res.data[0].balance
+        console.log(row)
+        const date = new Date()
+        const year = date.getFullYear()
+        const month = (date.getMonth() + 1)
+        const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
+        const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
+        const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+        const ss = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
+        const endTime = `${year}-${month < 10 ? '0' + month : month}-${day} ${hour}:${minutes}`
+        const iosEndTime = endTime.replace(/-/g, '/') // ios不识别hh-mm
+        const iosStartTime = row.startTime.replace(/-/g, '/')
+        const diffSeconds = (new Date(iosEndTime).getTime()) - (new Date(iosStartTime).getTime())
+        const tableHour = Math.floor(diffSeconds / 1000 / 3600)
+        const tableMinute = diffSeconds / 1000 / 60 % 60
+        console.log(iosEndTime, 'en')
+        console.log(iosStartTime, 'st')
+        console.log(tableHour, 'h')
+        console.log(tableMinute, 'm')
+        if (tableMinute < 30 && tableMinute > 0) {
+          this.totalMoney = (tableHour + 0.5) * row.price
+        } else if (tableMinute === 0 && tableMinute === 0) {
+          this.totalMoney = 0
+        } else {
+          this.totalMoney = (tableHour + 1) * row.price
+        }
+        wx.showModal({
+          title: '消费金额',
+          content: `您消费时间共${tableHour}小时${tableMinute < 10 ? '0' + tableMinute : tableMinute}分，消费金额为${this.totalMoney}元`,
+          success: res => {
+            let nowBalance
+            if (res.confirm) {
+              this.$db.collection('userInfo').where({
+                _openid: Megalo.getStorageSync('openid')
+              }).get({
+                success: res => {
+                  nowBalance = res.data[0].balance
+                  if (nowBalance >= this.totalMoney) {
+                    wx.showToast({
+                      title: '支付成功',
+                      icon: 'none',
+                      success: _ => {
+                        this.$db.collection('tables').where({
+                          _id: row._id
+                        }).update({
+                          data: {
+                            startTime: '',
+                            isUsing: false
+                          }
+                        })
+                      }
+                    })
                     this.$db.collection('userInfo').where({
                       _openid: Megalo.getStorageSync('openid')
                     }).update({
@@ -230,18 +252,28 @@ export default {
                     // setTimeout(_ => {
                     wx.reLaunch({ url: `/pages/billiards/billiardsDetail?startTime=${row.startTime}&endTime=${endTime}&totalMoney=${this.totalMoney}` })
                     // }, 1000)
+                  } else {
+                    wx.showToast({
+                      title: '很抱歉您的余额不足，请前往充值',
+                      icon: 'none',
+                      success: _ => {
+                        wx.navigateTo({
+                          url: '/pages/my/recharge'
+                        })
+                      }
+                    })
                   }
-                })
-              }
-            })
-          } else if (res.cancel) {
-            wx.showToast({
-              title: '支付失败，请尽快支付',
-              icon: 'none'
-            })
+                }
+              })
+            } else if (res.cancel) {
+              wx.showToast({
+                title: '支付失败，请尽快支付',
+                icon: 'none'
+              })
+            }
           }
-        }
-      })
+        })
+      }
     }
   }
 }
