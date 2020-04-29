@@ -1,6 +1,7 @@
 <config>
   {
-    'enablePullDownRefresh': true
+    'enablePullDownRefresh': true,
+    'navigationBarTitleText': '购物车',
   }
 </config>
 <template>
@@ -96,7 +97,7 @@ export default {
           sum += e.price * e.count
           this.totalPrice = sum.toFixed(2)
         } else {
-          this.totalPrice = 0
+          this.totalPrice = sum.toFixed(2)
         }
       })
     },

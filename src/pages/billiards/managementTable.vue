@@ -19,7 +19,7 @@
           <div v-else style="width:200rpx" class="text-ellipsis">{{item.name}}</div>
           <input type="text" placeholder="输入价格" style="width:170rpx" v-if="isEdit && tableId === item._id" v-model="tablePrice">
           <div v-else style="width:170rpx">{{item.price}}</div>
-          <switch style="width:180rpx;zoom:.8" :checked="item.disable" @change="changeStatus(item)"/>
+          <switch style="width:180rpx;zoom:.8" :checked="!item.disable" @change="changeStatus(item)"/>
         </div>
         <div class="flex">
           <i @click="submitTable(item._id)" v-if="isEdit && tableId === item._id" class="icon_submit" />
