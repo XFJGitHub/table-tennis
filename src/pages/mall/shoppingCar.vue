@@ -136,7 +136,6 @@ export default {
     },
     checkedCurrent (row) {
       // md 面向数据库编程= =
-      console.log(row.isChecked, '前')
       this.$db.collection('shoppingCar').where({
         _id: row._id
       }).update({

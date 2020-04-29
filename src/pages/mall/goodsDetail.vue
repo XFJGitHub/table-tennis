@@ -140,12 +140,15 @@ export default {
             icon: 'none'
           })
         } else {
+          const time = new Date()
           this.$db.collection('shoppingCar').add({
             data: {
+              createdTime: time,
               name: this.dataList.name,
               price: this.dataList.price,
               count: this.goodsNum,
               url: this.dataList.url[0],
+              isChecked: false,
               isClosed: false
             },
             success: _ => {
