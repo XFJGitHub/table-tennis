@@ -120,12 +120,12 @@ export default {
             } else {
               const startTime = `${year}-${month}-${day} ${hour}:${minutes}`
               console.log(startTime, 'st')
-              this.$db.collection('tables').where({
-                _id: row._id
-              }).update({
+              wx.cloud.callFunction({
+                name: 'useTable',
                 data: {
+                  id: row._id,
                   startTime: startTime,
-                  isUsing: true
+                  useName: Megalo.getStorageSync('nickName')
                 },
                 success: _ => {
                   this.getData()
@@ -228,14 +228,20 @@ export default {
                       title: '支付成功',
                       icon: 'none',
                       success: _ => {
-                        this.$db.collection('tables').where({
-                          _id: row._id
-                        }).update({
+                        wx.cloud.callFunction({
+                          name: 'settleTable',
                           data: {
-                            startTime: '',
-                            isUsing: false
+                            id: row._id
                           }
                         })
+                        // this.$db.collection('tables').where({
+                        //   _id: row._id
+                        // }).update({
+                        //   data: {
+                        //     startTime: '',
+                        //     isUsing: false
+                        //   }
+                        // })
                       }
                     })
                     this.$db.collection('userInfo').where({

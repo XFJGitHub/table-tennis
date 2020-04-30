@@ -96,10 +96,15 @@ export default {
           this.goodsList = res.data
         }
       })
-      db.collection('shoppingCar').where({
-        _openid: Megalo.getStorageSync('openid')
-      }).count().then(res => {
-        this.totalCount = res.total
+      wx.cloud.callFunction({
+        name: 'getShoppingCount',
+        data: {
+          openid: Megalo.getStorageSync('openid')
+        },
+        success: res => {
+          console.log(res)
+          this.totalCount = res.result.total
+        }
       })
       // db.collection('mall').get({
       //   success: res => {
