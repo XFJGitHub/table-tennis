@@ -160,8 +160,6 @@ export default {
     },
     // 生成使用情况
     setUsingInfo (row, tableHour, totalMoney) {
-      console.log(row.startTime.slice(5, 10), 'mp')
-      console.log(new Date(row.startTime.slice(5, 10)).getTime(), 'timeStamp')
       this.$db.collection('tableUsing').add({
         data: {
           day: row.startTime.slice(5, 10),

@@ -59,12 +59,14 @@ export default {
       } catch (e) {
         console.error('getSystemInfoSync failed!')
       }
-      this.$db.collection('tableUsing').where({
-        day: this.startDate
-      }).get({
+      wx.cloud.callFunction({
+        name: 'tableUseInfo',
+        data: {
+          startDate: this.startDate
+        },
         success: res => {
           this.allDayData = [0, 0, 0, 0]
-          res.data.map(e => {
+          res.result.data.map(e => {
             if (e.time.slice(0, 2) > 0 && e.time.slice(0, 2) <= 5) {  // 凌晨
               this.allDayData[0]++
             } else if (e.time.slice(0, 2) > 5  && e.time.slice(0, 2) <= 12) { // 早
@@ -98,8 +100,15 @@ export default {
             width: windowWidth,
             height: 300
           });
+        },
+        fail: err => {
+          console.log(err)
         }
       })
+      // this.$db.collection('tableUsing').where({
+      //   day: this.startDate
+      // }).get({
+      // })
     },
     changeStaratDay (e) {
       const month = e.detail.value[0] + 1
