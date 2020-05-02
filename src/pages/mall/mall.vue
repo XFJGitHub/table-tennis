@@ -61,6 +61,9 @@
               <div class="shopping-car-count">{{totalCount}}</div>
             </div>
           </movable-view>
+          <div class="color_156 fontsize_26 justify_center py_20" v-if="isEmpty">
+            -已经拉到底啦-
+          </div>
         </movable-area>
       </div>
       <div class="align_center flex_column" style="margin-left:140rpx;" v-else>
@@ -72,6 +75,7 @@
 </template>
 
 <script>
+/*eslint-disable*/
 export default {
   data () {
     return {
@@ -83,34 +87,67 @@ export default {
       advertingUrl: '',
       totalCount: 0,
       routerList: [],
-      goodsList: []
+      goodsList: [],
+      pageNo: 0,
+      pageSize: 20,
+      stopLoad: false,
+      isEmpty: false
+    }
+  },
+  onReachBottom () {
+    if (!this.stopLoad) {
+      wx.showLoading({
+        title: '玩命加载中'
+      })
+      this.$db.collection('goods').where({
+          goodsType: this.currentRouter
+        }).count().then(res => {
+        if (this.goodsList.length < res.total) {
+          this.stopLoad = false
+          this.pageNo++
+          this.getData().then(_ => {
+            wx.hideLoading()
+          })
+        } else {
+          this.stopLoad = true
+          this.isEmpty = true
+          wx.hideLoading()
+        }
+      })
     }
   },
   methods: {
     getData () {
-      const db = wx.cloud.database()
-      db.collection('goods').where({
-        goodsType: this.currentRouter
-      }).get({
-        success: res => {
-          this.goodsList = res.data
-        }
-      })
+      let getData = (res, rej) => {
+        const db = wx.cloud.database()
+        db.collection('goods').where({
+          goodsType: this.currentRouter
+        }).skip(this.pageNo * this.pageSize)
+        .limit(this.pageSize)
+        .get({
+          success: res => {
+            this.goodsList = this.goodsList.concat(res.data)
+          }
+        })
+        res()
+      }
+      return new Promise(getData)
+      // db.collection('mall').get({
+      //   success: res => {
+      //     this.advertingUrl = res.data[0].advertingUrl
+      //   }
+      // })
+    },
+    getCarCount () {
       wx.cloud.callFunction({
         name: 'getShoppingCount',
         data: {
           openid: Megalo.getStorageSync('openid')
         },
         success: res => {
-          console.log(res)
           this.totalCount = res.result.total
         }
       })
-      // db.collection('mall').get({
-      //   success: res => {
-      //     this.advertingUrl = res.data[0].advertingUrl
-      //   }
-      // })
     },
     getRouterList () {
       this.$db.collection('routerList').get({
@@ -124,6 +161,9 @@ export default {
     changeRouter (item, ind) {
       this.currentRouter = item.name
       this.active = ind
+      this.pageNo = 0
+      this.goodsList = []
+      this.isEmpty = false
       this.getData()
     },
     joinShoppingCar () {
@@ -149,6 +189,7 @@ export default {
   },
   onShow () {
     this.getRouterList()
+    this.getCarCount()
   }
 }
 </script>

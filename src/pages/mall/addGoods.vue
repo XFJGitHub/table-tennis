@@ -155,7 +155,8 @@ export default {
             name: this.goodsTitle,
             price: this.goodsPrice,
             tags: this.toHouse,
-            url: this.imgList
+            url: this.imgList,
+            recommend: false
           },
           goodsType: this.routerList[this.routerIndex]
         },

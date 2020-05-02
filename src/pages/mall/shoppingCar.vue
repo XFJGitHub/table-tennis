@@ -6,7 +6,7 @@
 </config>
 <template>
   <div class="shopping-car-wrap">
-    <div v-if="dataList.length > 0">
+    <div v-if="dataList.length > 0" style="padding-bottom: 110rpx">
       <div class="color_156 ml_20 fontsize_26">共{{totalCount}}件宝贝即将与您见面</div>
       <div
       class="shopping-wrap"
@@ -39,6 +39,9 @@
           </div>
         </div>
       </div>
+      <div class="color_156 fontsize_26 justify_center py_20" v-if="isEmpty">
+        -已经拉到底啦-
+      </div>
       <div class="shoppign-car-bottom" :style="{ 'padding-bottom': isX ? '160rpx' : ''}">
         <div class="flex align_center" @click="checkedAll">
           <radio :checked="checkAll" color="#ff4e00" style="zoom:.8"/>
@@ -65,7 +68,11 @@ export default {
       checkAll: false,
       dataList: [],
       totalCount: undefined,
-      totalPrice: 0
+      totalPrice: 0,
+      pageNo: 0,
+      pageSize: 20,
+      stopLoad: false,
+      isEmpty: false
     }
   },
   onPullDownRefresh () {
@@ -76,6 +83,24 @@ export default {
     this.getData()
     this.getCount()
   },
+  onReachBottom () {
+    if (!this.stopLoad) {
+      wx.showLoading({
+        title: '玩命加载中'
+      })
+      if (this.dataList.length < this.totalCount) {
+        this.stopLoad = false
+        this.pageNo++
+        this.getData().then(_ => {
+          wx.hideLoading()
+        })
+      } else {
+        this.isEmpty = true
+        this.stopLoad = true
+        wx.hideLoading()
+      }
+    }
+  },
   methods: {
     getCount () {
       this.$db.collection('shoppingCar').count().then(res => {
@@ -83,12 +108,30 @@ export default {
       })
     },
     getData () {
-      this.$db.collection('shoppingCar').get({
-        success: res => {
-          this.dataList = res.data
-          this.getTotalPrice()
-        }
-      })
+      let getData = (res, rej) => {
+        this.$db.collection('shoppingCar')
+          .skip(this.pageNo * this.pageSize)
+          .limit(this.pageSize)
+          .get({
+            success: res => {
+              this.dataList = this.dataList.concat(res.data)
+              let flag = 0 // 0全选
+              this.dataList.map(e => {
+                if (e.isChecked === false) {
+                  ++flag
+                }
+              })
+              if (flag === 0) {
+                this.checkAll = true
+              } else {
+                this.checkAll = false
+              }
+              this.getTotalPrice()
+            }
+          })
+        res()
+      }
+      return new Promise(getData)
     },
     getTotalPrice () {
       let sum = 0
@@ -97,12 +140,12 @@ export default {
           sum += e.price * e.count
           this.totalPrice = sum.toFixed(2)
         } else {
-          this.totalPrice = sum.toFixed(2)
+          this.totalPrice = sum === 0 ? sum : sum.toFixed(2)
         }
       })
     },
     checkedAll () {
-      let flag = 0 // 是否全选状态
+      let flag = 0 // 0全选
       this.dataList.map(e => {
         if (e.isChecked === false) {
           return ++flag

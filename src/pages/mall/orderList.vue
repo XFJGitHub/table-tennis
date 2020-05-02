@@ -38,6 +38,9 @@
       <img style="margin-top: 200rpx;width: 280rpx;height:200rpx" src="https://static.dingdandao.com/612007ba2dc43b5c6646f19fe54a4206">
       <div style="color: #a3b1bf" class="mt_20 fontsize_26">暂无数据</div>
     </div>
+    <div class="color_156 fontsize_26 justify_center py_20" v-if="isEmpty">
+      -已经拉到底啦-
+    </div>
   </div>
 </template>
 
@@ -46,7 +49,31 @@ export default {
   data () {
     return {
       activeTab: 0,
-      dataList: []
+      dataList: [],
+      pageNo: 0,
+      pageSize: 10,
+      stopLoad: false,
+      isEmpty: false
+    }
+  },
+  onReachBottom () {
+    if (!this.stopLoad) {
+      wx.showLoading({
+        title: '玩命加载中'
+      })
+      this.$db.collection('orderList').count().then(res => {
+        if (this.dataList.length < res.total) {
+          this.pageNo++
+          this.stopLoad = false
+          this.getData().then(_ => {
+            wx.hideLoading()
+          })
+        } else {
+          this.isEmpty = true
+          this.stopLoad = true
+          wx.hideLoading()
+        }
+      })
     }
   },
   methods: {
@@ -57,17 +84,26 @@ export default {
         _openid: Megalo.getStorageSync('openid'),
         orderType: 1
       }
-      this.$db.collection('orderList').aggregate().sort({
-        time: -1
-      }).match({
-        ...params
-      }).end({
-        success: res => {
-          this.dataList = res.list
-        }
-      })
+      let getData = (res, rej) => {
+        this.$db.collection('orderList').aggregate().sort({
+          time: -1
+        }).match({
+          ...params
+        }).skip(this.pageNo * this.pageSize)
+          .limit(this.pageSize)
+          .end({
+            success: res => {
+              this.dataList = this.dataList.concat(res.list)
+            }
+          })
+        res()
+      }
+      return new Promise(getData)
     },
     changeTab (type) {
+      this.pageNo = 0
+      this.dataList = []
+      this.isEmpty = false
       this.activeTab = type
       this.getData()
     },
