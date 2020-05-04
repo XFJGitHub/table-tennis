@@ -25,7 +25,7 @@
         </div>
         <div class="index-icon-wrap" @click="toTabbar(1)">
           <i class="vedio-center"/>
-          <div class="icon-tips">视频中心</div>
+          <div class="icon-tips">账单中心</div>
         </div>
         <div class="index-icon-wrap" @click="toTabbar(2)">
           <i class="shopping-center"/>
@@ -101,11 +101,11 @@ export default {
     toTabbar (num) {
       const url = {
         0: '/pages/billiards/billiards',
-        1: '/pages/video/video',
+        1: '/pages/my/bill',
         2: '/pages/mall/mall',
         3: '/pages/my/advice'
       }
-      if (num === 3) {
+      if (num === 3 || num === 1) {
         wx.navigateTo({
           url: url[num]
         })

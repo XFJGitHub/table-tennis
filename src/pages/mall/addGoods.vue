@@ -155,9 +155,9 @@ export default {
             name: this.goodsTitle,
             price: this.goodsPrice,
             tags: this.toHouse,
-            url: this.imgList,
-            recommend: false
+            url: this.imgList
           },
+          recommend: false,
           goodsType: this.routerList[this.routerIndex]
         },
         success: _ => {

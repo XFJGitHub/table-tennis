@@ -1,36 +1,35 @@
 <config>
   {
     'navigationBarTitleText': '管理球桌',
-    'enablePullDownRefresh': true,
-    "pageOrientation": "auto"
+    'enablePullDownRefresh': true
   }
 </config>
 <template>
   <div class="mg-table">
     <div style="border:1px solid #e5e5e5">
       <div class="table-head">
-        <div style="width:200rpx">球桌名</div>
-        <div style="width:170rpx">球桌价格</div>
-        <div style="width:160rpx">上/下架</div>
+        <div style="width:200rpx">商品名</div>
+        <div style="width:170rpx">商品价格</div>
+        <div style="width:160rpx">推荐商品</div>
         <div style="width:200rpx">操作区</div>
       </div>
-      <div class="flex align_center py_20" v-for="(item, ind) in tableList" :key="ind">
+      <div class="flex align_center py_20" v-for="(item, ind) in dataList" :key="ind">
         <div class="flex">
-          <input type="text" placeholder="输入球桌名" style="width:200rpx" v-if="isEdit && tableId === item._id" v-model="tableName">
-          <div v-else style="width:200rpx" class="text-ellipsis">{{item.name}}</div>
-          <input type="text" placeholder="输入价格" style="width:170rpx" v-if="isEdit && tableId === item._id" v-model="tablePrice">
-          <div v-else style="width:170rpx">{{item.price}}</div>
-          <switch style="width:180rpx;zoom:.8" :checked="item.disable" @change="changeStatus(item)"/>
+          <input type="text" placeholder="输入商品名" style="width:200rpx" v-if="isEdit && goodsId === item._id" v-model="goodsName">
+          <div v-else style="width:200rpx" class="text-ellipsis">{{item.goodsDetail.name}}</div>
+          <input type="text" placeholder="输入价格" style="width:180rpx" v-if="isEdit && goodsId === item._id" v-model="goodsPrice">
+          <div v-else style="width:180rpx">{{item.goodsDetail.price}}</div>
+          <switch style="width:180rpx;zoom:.7" :checked="item.recommend" @change="changeStatus(item)"/>
         </div>
-        <div class="flex">
-          <i @click="submitTable(item._id)" v-if="isEdit && tableId === item._id" class="icon_submit" />
+        <div class="flex ml_20">
+          <i @click="submitTable(item._id)" v-if="isEdit && goodsId === item._id" class="icon_submit" />
           <i @click="editTable(item)" v-else class="icon_edit" />
           <i @click="deleteTable(item._id)" class="ml_20 icon_delete" />
         </div>
       </div>
       <div @click="addGoods" class="table-add">
         <i class="icon_add"></i>
-        <div class="ml_20">添加球桌</div>
+        <div class="ml_20">添加商品</div>
       </div>
     </div>
   </div>
@@ -41,48 +40,51 @@ export default {
   data () {
     return {
       isEdit: false,
-      tableList: [],
-      tableStatus: '',
-      tableId: '',
-      tableName: '',
-      tablePrice: ''
+      dataList: [],
+      goodsId: '',
+      goodsName: '',
+      goodsPrice: ''
     }
   },
   onPullDownRefresh () {
     this.getData()
     wx.stopPullDownRefresh()
   },
-  onLoad () {
+  onShow () {
     this.getData()
   },
   methods: {
     getData () {
-      this.$db.collection('tables').get({
+      wx.cloud.callFunction({
+        name: 'getGoods',
         success: res => {
-          this.tableList = res.data
+          this.dataList = res.result.data
         }
       })
     },
     changeStatus (row) {
-      this.$db.collection('tables').where({
-        _id: row._id
-      }).update({
+      wx.cloud.callFunction({
+        name: 'goodsRecommend',
         data: {
-          disable: !row.disable
+          id: row._id,
+          recommend: !row.recommend
+        },
+        success: _ => {
+          this.getData()
         }
       })
     },
     editTable (row) {
       this.isEdit = true
-      this.tableId = row._id
+      this.goodsId = row._id
     },
     deleteTable (id) {
-      this.$db.collection('tables').where({
+      this.$db.collection('goods').where({
         _id: id
       }).remove({
         success: _ => {
           wx.showToast({
-            title: '删除球桌成功',
+            title: '删除商品成功',
             success: _ => {
               this.getData()
             }
@@ -91,18 +93,20 @@ export default {
       })
     },
     submitTable (id) {
-      if (this.tableName && this.tablePrice) {
-        this.$db.collection('tables').where({
+      if (this.goodsName && this.goodsPrice) {
+        this.$db.collection('goods').where({
           _id: id
         }).update({
           data: {
-            price: this.tablePrice,
-            name: this.tableName
+            goodsDetail: {
+              price: this.goodsPrice,
+              name: this.goodsName
+            }
           },
           success: _ => {
             this.isEdit = false
             wx.showToast({
-              title: '修改球桌信息成功',
+              title: '修改商品信息成功',
               success: _ => {
                 this.getData()
               }
@@ -111,7 +115,7 @@ export default {
         })
       } else {
         wx.showToast({
-          title: '请检查球桌名和价格是否都填写',
+          title: '请检查商品名和价格是否都填写',
           icon: 'none'
         })
       }

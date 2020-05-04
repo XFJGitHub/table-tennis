@@ -30,8 +30,8 @@ export default {
       'pages/billiards/managementTable',
       'pages/billiards/addTable',
       'pages/billiards/appointment',
-      'pages/video/video',
-      'pages/video/articleDetail',
+      // 'pages/video/video',
+      // 'pages/video/articleDetail',
       'pages/mall/mall',
       'pages/mall/managementGoods',
       'pages/mall/addGoods',
@@ -66,12 +66,12 @@ export default {
           iconPath: 'native/tabbar/taiqiu.png',
           selectedIconPath: 'native/tabbar/taiqiu_on.png'
         },
-        {
-          pagePath: 'pages/video/video',
-          text: '社区',
-          iconPath: 'native/tabbar/video.png',
-          selectedIconPath: 'native/tabbar/video_on.png'
-        },
+        // {
+        //   pagePath: 'pages/video/video',
+        //   text: '社区',
+        //   iconPath: 'native/tabbar/video.png',
+        //   selectedIconPath: 'native/tabbar/video_on.png'
+        // },
         {
           pagePath: 'pages/mall/mall',
           text: '商城',
