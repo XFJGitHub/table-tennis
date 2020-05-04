@@ -57,17 +57,24 @@ export default {
       dateArray: [],
       startDate: '',
       endDate: '',
+      iosStartDate: '', // ios只识别yyyy/mm/dd
+      iosEndDate: ''
     }
   },
   onShow () {
-      const date = new Date()
-      const month = (date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
-      const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
-      this.startDayIndex = [month - 1, day - 6]
-      this.startDate =  month + '-' + (day - 6)
-      this.start7end()
-      this.computerXdate()
-      this.getData()
+    const date = new Date()
+    const temp = date.getTime()
+    const sevenBefore = new Date() - 24 * 3600000 * 6
+    console.log(sevenBefore)
+    const year = new Date(sevenBefore).getFullYear()
+    const month = (new Date(sevenBefore).getMonth() + 1) < 10 ? '0' + (new Date(sevenBefore).getMonth() + 1) : new Date(sevenBefore).getMonth() + 1
+    const day = new Date(sevenBefore).getDate() < 10 ? '0' + new Date(sevenBefore).getDate() : new Date(sevenBefore).getDate()
+    this.startDayIndex = [month - 1, day - 1]
+    this.iosStartDate = `${year}/${month}/${day}`
+    this.startDate =  month + '-' + day
+    this.start7end()
+    this.computerXdate()
+    this.getData()
   },
   methods: {
     getData () {
@@ -83,6 +90,8 @@ export default {
       //   totalPrice: $.sum('$totalMoney'),
       //   totalCount: $.sum(1)
       // }).end().then(res => {
+      console.log(this.startDate, 'st')
+      console.log(this.endDate, 'en')
       wx.cloud.callFunction({
         name: 'getEveryDay',
         data: {
@@ -196,9 +205,9 @@ export default {
     },
     // 计算x轴的时间
     computerXdate () {
-      let timeDiff = (new Date(this.endDate).getTime() - new Date(this.startDate).getTime()) / 24 / 3600000
+      let timeDiff = (new Date(this.iosEndDate).getTime() - new Date(this.iosStartDate).getTime()) / 24 / 3600000
       for (var i = 0;i <= timeDiff; i++) {
-        let tempMs = new Date(new Date(this.startDate).getTime() + i * 24 * 3600000).getTime()
+        let tempMs = new Date(new Date(this.iosStartDate).getTime() + i * 24 * 3600000).getTime()
         let tempMonth = new Date(tempMs).getMonth() + 1
         let tempDay = new Date(tempMs).getDate()
         this.dateArray[i] = (tempMonth < 10 ? '0' + tempMonth : tempMonth) + '-' + (tempDay < 10 ? '0' + tempDay : tempDay) 
@@ -206,22 +215,27 @@ export default {
     },
     start7end () {
       // 设置开始结束时间相差一周
-      const startMs = new Date(this.startDate).getTime()
+      const startMs = new Date(this.iosStartDate).getTime()
+      const endYear = new Date(startMs + 24 * 3600000 * 6).getFullYear()
       const endMonth = new Date(startMs + 24 * 3600000 * 6).getMonth() + 1
       const endDay = new Date(startMs + 24 * 3600000 * 6).getDate()
       this.endDayIndex = [endMonth - 1, endDay -1]
+      this.iosEndDate = `${endYear}/${endMonth}/${endDay}`
       this.endDate = (endMonth < 10 ? '0' + endMonth : endMonth) + '-' + (endDay < 10 ? '0' + endDay : endDay)
     },
     end7start () {
-      const endMs = new Date(this.endDate).getTime()
+      const endMs = new Date(this.iosEndDate).getTime()
+      const startYear = new Date(endMs - 24 * 3600000 * 7).getYear() + 1
       const startMonth = new Date(endMs - 24 * 3600000 * 7).getMonth() + 1
       const startDay = new Date(endMs - 24 * 3600000 * 7).getDate()
       this.startIndex = [startMonth - 1, startDay -1]
+      this.iosStartDate = `${startYear}/${startMonth}/${startDay}`
       this.startDate = (startMonth < 10 ? '0' + startMonth : startMonth) + '-' + (startDay < 10 ? '0' + startDay : startDay)
     },
     changeStaratDay (e) {
       const month = e.detail.value[0] + 1
       const day = e.detail.value[1] + 1
+      this.iosStartDate = `2020/${month}/${day}`
       this.startDate = (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day) 
       this.start7end()
       this.computerXdate()
@@ -230,6 +244,7 @@ export default {
     changeEndDay (e) {
       const month = e.detail.value[0] + 1
       const day = e.detail.value[1] + 1
+      this.iosEndDate = `2020/${month}/${day}`
       this.endDate = (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day) 
       this.end7start()
       this.computerXdate()

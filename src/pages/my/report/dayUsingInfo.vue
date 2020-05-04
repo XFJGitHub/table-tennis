@@ -89,13 +89,15 @@ export default {
               }
             ],
             yAxis: {
-                format: function (val) {
-                    return val + '次';
-                }
+              format: function (val) {
+                return val + '次';
+              },
+              min: 0,
+              allowDecimals: false
             },
             xAxis: {
-                disableGrid: true,
-                type: 'calibration'
+              disableGrid: true,
+              type: 'calibration'
             },
             width: windowWidth,
             height: 300
@@ -105,10 +107,6 @@ export default {
           console.log(err)
         }
       })
-      // this.$db.collection('tableUsing').where({
-      //   day: this.startDate
-      // }).get({
-      // })
     },
     changeStaratDay (e) {
       const month = e.detail.value[0] + 1
