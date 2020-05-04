@@ -79,10 +79,13 @@ export default {
       this.goodsId = row._id
     },
     deleteTable (id) {
-      this.$db.collection('goods').where({
-        _id: id
-      }).remove({
+      wx.cloud.callFunction({
+        name: 'deleteGoods',
+        data: {
+          id: id
+        },
         success: _ => {
+          console.log(_)
           wx.showToast({
             title: '删除商品成功',
             success: _ => {
@@ -91,6 +94,22 @@ export default {
           })
         }
       })
+      // this.$db.collection('goods').where({
+      //   _id: id
+      // }).remove({
+      //   success: _ => {
+      //     console.log(_)
+      //     wx.showToast({
+      //       title: '删除商品成功',
+      //       success: _ => {
+      //         this.getData()
+      //       }
+      //     })
+      //   },
+      //   fail: err => {
+      //     console.log(err)
+      //   }
+      // })
     },
     submitTable (id) {
       if (this.goodsName && this.goodsPrice) {

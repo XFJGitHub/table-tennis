@@ -154,6 +154,7 @@ export default {
         success: res => {
           this.routerList = res.data
           this.currentRouter = res.data[0].name
+          this.goodsList = []
           this.getData()
         }
       })
@@ -161,6 +162,7 @@ export default {
     changeRouter (item, ind) {
       this.currentRouter = item.name
       this.active = ind
+      this.stopLoad = false
       this.pageNo = 0
       this.goodsList = []
       this.isEmpty = false
@@ -187,7 +189,7 @@ export default {
     //   })
     // }
   },
-  onShow () {
+  onLoad () {
     this.getRouterList()
     this.getCarCount()
   }

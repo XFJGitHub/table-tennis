@@ -8,12 +8,12 @@
     <div class="border_bottom p_20" style="width: 100%">
       <span class="red_star">*</span>
       商品名称
-      <input v-model="goodsTitle" style="margin:10rpx 0 0 23rpx" type="text" placeholder="请输入商品名称"/>
+      <input v-model="goodsTitle" style="margin:10rpx 24rpx 0 24rpx" type="text" placeholder="请输入商品名称"/>
     </div>
     <div class="border_bottom p_20" style="width: 100%">
       <span class="red_star">*</span>
       商品价格
-      <input v-model="goodsPrice" style="margin:10rpx 0 0 23rpx" type="number" placeholder="请输入商品价格"/>
+      <input v-model="goodsPrice" style="margin:10rpx 24rpx 0 24rpx" type="number" placeholder="请输入商品价格"/>
     </div>
     <div class="border_bottom p_20" style="width: 100%">
       <div>
@@ -52,6 +52,7 @@
     </div>
 
     <div class="p_20">
+      <span class="red_star">*</span>
       上传商品图片<span class="fontsize_22 color_156">（最多上传5张）</span>
       <div class="flex flex_wrap mt_20" @click="chooseImg">
         <template v-if="imgList.length > 0">
@@ -75,6 +76,7 @@
 </template>
 
 <script>
+/*eslint-disable*/
 export default {
   data () {
     return {
@@ -145,33 +147,60 @@ export default {
           res.tempFiles.map(e => {
             that.imgList.push(e.path)
           })
+          console.log(that.imgList)
         }
       })
     },
     submit () {
-      this.$db.collection('goods').add({
-        data: {
-          goodsDetail: {
-            name: this.goodsTitle,
-            price: this.goodsPrice,
-            tags: this.toHouse,
-            url: this.imgList
+      if (this.goodsTitle && this.goodsPrice && this.imgList) {
+        wx.cloud.callFunction({
+          name: 'addGoods',
+          data: {
+            goodsTitle: this.goodsTitle,
+            goodsPrice: this.goodsPrice,
+            toHouse: this.toHouse,
+            imgList: this.imgList,
+            goodsType: this.routerList[this.routerIndex]
           },
-          recommend: false,
-          goodsType: this.routerList[this.routerIndex]
-        },
-        success: _ => {
-          wx.showToast({
-            title: '提交成功',
-            success: _ => {
-              this.goodsTitle = ''
-              this.goodsPrice = ''
-              this.goodsType = ''
-              this.imgList = []
-            }
-          })
-        }
-      })
+          success: _ => {
+            wx.showToast({
+              title: '提交成功',
+              success: _ => {
+                this.goodsTitle = ''
+                this.goodsPrice = ''
+                this.imgList = []
+              }
+            })
+          }
+        })
+        // this.$db.collection('goods').add({
+        //   data: {
+        //     goodsDetail: {
+        //       name: this.goodsTitle,
+        //       price: this.goodsPrice,
+        //       tags: this.toHouse,
+        //       url: this.imgList
+        //     },
+        //     recommend: false,
+        //     goodsType: this.routerList[this.routerIndex]
+        //   },
+        //   success: _ => {
+        //     wx.showToast({
+        //       title: '提交成功',
+        //       success: _ => {
+        //         this.goodsTitle = ''
+        //         this.goodsPrice = ''
+        //         this.imgList = []
+        //       }
+        //     })
+        //   }
+        // })
+      } else {
+        wx.showToast({
+          title: '带有*号为必填选项',
+          icon: 'none'
+        })
+      }
     }
   }
 }

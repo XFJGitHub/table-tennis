@@ -213,7 +213,7 @@ export default {
           this.totalMoney = (tableHour + 1) * row.price
         }
         wx.showModal({
-          title: '消费金额',
+          title: row.useName !== Megalo.getStorageSync('nickName') ? `您确定要为【${row.useName}】用户结账吗？` : '消费金额',
           content: `您消费时间共${tableHour}小时${tableMinute < 10 ? '0' + tableMinute : tableMinute}分，消费金额为${this.totalMoney}元`,
           success: res => {
             let nowBalance
