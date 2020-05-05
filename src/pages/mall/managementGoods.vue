@@ -57,6 +57,9 @@ export default {
     getData () {
       wx.cloud.callFunction({
         name: 'getGoods',
+        data: {
+          goodsType: ''
+        },
         success: res => {
           this.dataList = res.result.data
         }
@@ -85,12 +88,9 @@ export default {
           id: id
         },
         success: _ => {
-          console.log(_)
+          this.getData()
           wx.showToast({
-            title: '删除商品成功',
-            success: _ => {
-              this.getData()
-            }
+            title: '删除商品成功'
           })
         }
       })

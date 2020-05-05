@@ -82,11 +82,10 @@ export default {
           this.swiperImgs = res.data[0].imgList
         }
       })
-      db.collection('goods').where({
-        recommend: true
-      }).get({
+      wx.cloud.callFunction({
+        name: 'getRecommend',
         success: res => {
-          this.goodsList = res.data
+          this.goodsList = res.result.data  
         }
       })
     },

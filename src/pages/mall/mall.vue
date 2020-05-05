@@ -36,35 +36,32 @@
           {{item.name}}
         </div>
       </div>
-      <div v-if="goodsList.length > 0" class="right-content relative">
-        <movable-area class="w_100 h_100">
-          <div
-            class="flex ml_20 mb_20"
-            v-for="(ite) in goodsList"
-            :key="ite.id"
-            @click="toGoodsDetail(ite)"
-          >
-            <div style="width: 200rpx;height:200rpx">
-              <img style="width:100%;height:100%;border-radius:20rpx" :src="ite.goodsDetail.url[0]">
-            </div>
-            <div class="goods_wrap">
-              <div style="width: 300rpx;" class="text-ellipsis">{{ite.goodsDetail.name}}</div>
-              <div v-if="ite.goodsDetail.tags !== 0" class="goods-tags">包邮</div>
-              <div class="goods-price">
-                ￥<span class="fontsize_40">{{ite.goodsDetail.price}}</span>
-              </div>
+      <div v-if="goodsList.length > 0" style="height:100vh;overflow:auto" class="right-content relative">
+        <!-- <movable-area class="w_100" > -->
+        <div
+          class="flex ml_20 mb_20"
+          v-for="(ite) in goodsList"
+          :key="ite.id"
+          @click="toGoodsDetail(ite)"
+        >
+          <div style="width: 200rpx;height:200rpx">
+            <img style="width:100%;height:100%;border-radius:20rpx" :src="ite.goodsDetail.url[0]">
+          </div>
+          <div class="goods_wrap">
+            <div style="width: 300rpx;" class="text-ellipsis">{{ite.goodsDetail.name}}</div>
+            <div v-if="ite.goodsDetail.tags !== 0" class="goods-tags">包邮</div>
+            <div class="goods-price">
+              ￥<span class="fontsize_40">{{ite.goodsDetail.price}}</span>
             </div>
           </div>
-          <movable-view direction="all" :x="x" :y="y">
-            <div @click="joinShoppingCar" style="width:80rpx" class="relative">
-              <i class="icon_shoppingCar" />
-              <div class="shopping-car-count">{{totalCount}}</div>
-            </div>
-          </movable-view>
-          <div class="color_156 fontsize_26 justify_center py_20" v-if="isEmpty">
-            -已经拉到底啦-
-          </div>
-        </movable-area>
+        </div>
+          <!-- <movable-view direction="all" :x="x" :y="y"> -->
+        <div @click="joinShoppingCar" style="width:80rpx;height:80rpx" class="relative position_car">
+          <i class="icon_shoppingCar" />
+          <div class="shopping-car-count">{{totalCount}}</div>
+        </div>
+          <!-- </movable-view> -->
+        <!-- </movable-area> -->
       </div>
       <div class="align_center flex_column" style="margin-left:140rpx;" v-else>
         <img style="margin-top: 200rpx;width: 280rpx;height:200rpx" src="https://static.dingdandao.com/612007ba2dc43b5c6646f19fe54a4206">
@@ -79,64 +76,28 @@
 export default {
   data () {
     return {
-      x: 200,
-      y: 370,
+      // x: 200,
+      // y: 370,
       keyword: '',
       active: 0,
       currentRouter: '',
       advertingUrl: '',
       totalCount: 0,
       routerList: [],
-      goodsList: [],
-      pageNo: 0,
-      pageSize: 20,
-      stopLoad: false,
-      isEmpty: false
-    }
-  },
-  onReachBottom () {
-    if (!this.stopLoad) {
-      wx.showLoading({
-        title: '玩命加载中'
-      })
-      this.$db.collection('goods').where({
-          goodsType: this.currentRouter
-        }).count().then(res => {
-        if (this.goodsList.length < res.total) {
-          this.stopLoad = false
-          this.pageNo++
-          this.getData().then(_ => {
-            wx.hideLoading()
-          })
-        } else {
-          this.stopLoad = true
-          this.isEmpty = true
-          wx.hideLoading()
-        }
-      })
+      goodsList: []
     }
   },
   methods: {
     getData () {
-      let getData = (res, rej) => {
-        const db = wx.cloud.database()
-        db.collection('goods').where({
+      wx.cloud.callFunction({
+        name: 'getGoods',
+        data: {
           goodsType: this.currentRouter
-        }).skip(this.pageNo * this.pageSize)
-        .limit(this.pageSize)
-        .get({
-          success: res => {
-            this.goodsList = this.goodsList.concat(res.data)
-          }
-        })
-        res()
-      }
-      return new Promise(getData)
-      // db.collection('mall').get({
-      //   success: res => {
-      //     this.advertingUrl = res.data[0].advertingUrl
-      //   }
-      // })
+        },
+        success: res => {
+          this.goodsList = res.result.data
+        }
+      })
     },
     getCarCount () {
       wx.cloud.callFunction({
@@ -254,6 +215,11 @@ page {
       color: #fd7659;
     }
   }
+}
+.position_car {
+  position: fixed;
+  top: 700rpx;
+  left: 600rpx;
 }
 .shopping-car-count {
   border-radius: 50%;

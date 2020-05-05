@@ -1,6 +1,6 @@
 <config>
   {
-    'navigationBarTitleText': '商品添加',
+    'navigationBarTitleText': '添加商品',
   }
 </config>
 <template>
@@ -99,7 +99,8 @@ export default {
       goodsTitle: '',
       goodsPrice: '',
       goodsType: '',
-      imgList: []
+      imgList: [],
+      fileIDs: [],
     }
   },
   onShow () {
@@ -139,6 +140,7 @@ export default {
     },
     chooseImg () {
       let that = this
+      that.imgList = []
       wx.chooseImage({
         count: 5,
         sizeType: ['original', 'compressed'],
@@ -147,31 +149,52 @@ export default {
           res.tempFiles.map(e => {
             that.imgList.push(e.path)
           })
-          console.log(that.imgList)
         }
       })
     },
     submit () {
       if (this.goodsTitle && this.goodsPrice && this.imgList) {
-        wx.cloud.callFunction({
-          name: 'addGoods',
-          data: {
-            goodsTitle: this.goodsTitle,
-            goodsPrice: this.goodsPrice,
-            toHouse: this.toHouse,
-            imgList: this.imgList,
-            goodsType: this.routerList[this.routerIndex]
-          },
-          success: _ => {
-            wx.showToast({
-              title: '提交成功',
-              success: _ => {
-                this.goodsTitle = ''
-                this.goodsPrice = ''
-                this.imgList = []
-              }
+        wx.showLoading({
+          title: '提交中'
+        })
+        let promiseArr = []
+        for (let i = 0;i <this.imgList.length;i++) {
+          let filePath = this.imgList[i]
+          let suffix = /\.[^\.]+$/.exec(filePath)[0]  // 文件后缀
+          promiseArr.push(new Promise((reslove, reject) => {
+            wx.cloud.uploadFile({
+              cloudPath: new Date().getTime() + suffix,
+              filePath: filePath
+            }).then(res => {
+              this.fileIDs = this.fileIDs.concat(res.fileID)
+              reslove()
+            }).catch(err => {
+              console.log(err)
             })
-          }
+          }))
+        }
+        Promise.all(promiseArr).then(res => {
+          wx.cloud.callFunction({
+            name: 'addGoods',
+            data: {
+              goodsTitle: this.goodsTitle,
+              goodsPrice: this.goodsPrice,
+              toHouse: this.toHouse,
+              imgList: this.fileIDs,
+              goodsType: this.routerList[this.routerIndex]
+            },
+            success: _ => {
+              wx.hideLoading()
+              wx.showToast({
+                title: '提交成功',
+                success: _ => {
+                  this.goodsTitle = ''
+                  this.goodsPrice = ''
+                  this.imgList = []
+                }
+              })
+            }
+          })
         })
         // this.$db.collection('goods').add({
         //   data: {
