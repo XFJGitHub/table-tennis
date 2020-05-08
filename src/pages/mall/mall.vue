@@ -84,7 +84,8 @@ export default {
       advertingUrl: '',
       totalCount: 0,
       routerList: [],
-      goodsList: []
+      goodsList: [],
+      isLoading: false
     }
   },
   methods: {
@@ -95,7 +96,9 @@ export default {
           goodsType: this.currentRouter
         },
         success: res => {
+          wx.hideLoading()
           this.goodsList = res.result.data
+          this.isLoading = false
         }
       })
     },
@@ -121,13 +124,21 @@ export default {
       })
     },
     changeRouter (item, ind) {
-      this.currentRouter = item.name
-      this.active = ind
-      this.stopLoad = false
-      this.pageNo = 0
-      this.goodsList = []
-      this.isEmpty = false
-      this.getData()
+      wx.showLoading({
+        title: '加载中',
+        success: _ => {
+          this.isLoading = true
+        }
+      })
+      if (!this.isLoading) {
+        this.currentRouter = item.name
+        this.active = ind
+        this.stopLoad = false
+        this.pageNo = 0
+        this.goodsList = []
+        this.isEmpty = false
+        this.getData()
+      }
     },
     joinShoppingCar () {
       wx.navigateTo({

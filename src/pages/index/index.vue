@@ -85,7 +85,7 @@ export default {
       wx.cloud.callFunction({
         name: 'getRecommend',
         success: res => {
-          this.goodsList = res.result.data  
+          this.goodsList = res.result.data
         }
       })
     },
