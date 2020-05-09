@@ -119,6 +119,12 @@ export default {
           this.routerList = res.data
           this.currentRouter = res.data[0].name
           this.goodsList = []
+          wx.showLoading({
+            title: '加载中',
+            success: _ => {
+              this.isLoading = true
+            }
+          })
           this.getData()
         }
       })
@@ -161,9 +167,11 @@ export default {
     //   })
     // }
   },
+  onShow () {
+    this.getCarCount()
+  },
   onLoad () {
     this.getRouterList()
-    this.getCarCount()
   }
 }
 </script>

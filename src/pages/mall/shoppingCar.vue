@@ -39,10 +39,7 @@
           </div>
         </div>
       </div>
-      <div class="color_156 fontsize_26 justify_center py_20" v-if="isEmpty">
-        -已经拉到底啦-
-      </div>
-      <div class="shoppign-car-bottom" :style="{ 'padding-bottom': isX ? '160rpx' : ''}">
+      <div class="shoppign-car-bottom" :style="{ 'padding-bottom': isX ? '60rpx' : ''}">
         <div class="flex align_center" @click="checkedAll">
           <radio :checked="checkAll" color="#ff4e00" style="zoom:.8"/>
           <span class="fontsize_26">全选</span>
@@ -80,26 +77,11 @@ export default {
     wx.stopPullDownRefresh()
   },
   onShow () {
+    wx.showLoading({
+      title: '拼命加载中'
+    })
     this.getData()
     this.getCount()
-  },
-  onReachBottom () {
-    if (!this.stopLoad) {
-      wx.showLoading({
-        title: '玩命加载中'
-      })
-      if (this.dataList.length < this.totalCount) {
-        this.stopLoad = false
-        this.pageNo++
-        this.getData().then(_ => {
-          wx.hideLoading()
-        })
-      } else {
-        this.isEmpty = true
-        this.stopLoad = true
-        wx.hideLoading()
-      }
-    }
   },
   methods: {
     getCount () {
@@ -108,30 +90,23 @@ export default {
       })
     },
     getData () {
-      let getData = (res, rej) => {
-        this.$db.collection('shoppingCar')
-          .skip(this.pageNo * this.pageSize)
-          .limit(this.pageSize)
-          .get({
-            success: res => {
-              this.dataList = this.dataList.concat(res.data)
-              let flag = 0 // 0全选
-              this.dataList.map(e => {
-                if (e.isChecked === false) {
-                  ++flag
-                }
-              })
-              if (flag === 0) {
-                this.checkAll = true
-              } else {
-                this.checkAll = false
-              }
-              this.getTotalPrice()
+      wx.cloud.callFunction({
+        name: 'getShoppingCar',
+        success: res => {
+          this.dataList = res.result.data
+          let flag = 0 // 0全选
+          this.dataList.map(e => {
+            if (e.isChecked === true) {
+              ++flag
             }
           })
-        res()
-      }
-      return new Promise(getData)
+          if (flag === this.totalCount) {
+            this.checkAll = true
+          }
+          this.getTotalPrice()
+          wx.hideLoading()
+        }
+      })
     },
     getTotalPrice () {
       let sum = 0
@@ -145,6 +120,9 @@ export default {
       })
     },
     checkedAll () {
+      wx.showLoading({
+        title: '加载中'
+      })
       let flag = 0 // 0全选
       this.dataList.map(e => {
         if (e.isChecked === false) {
@@ -178,6 +156,9 @@ export default {
       }
     },
     checkedCurrent (row) {
+      wx.showLoading({
+        title: '加载中'
+      })
       // md 面向数据库编程= =
       this.$db.collection('shoppingCar').where({
         _id: row._id
@@ -205,7 +186,10 @@ export default {
       })
     },
     removeNums (row) {
-      if (row.count > 0) {
+      if (row.count > 1) {
+        wx.showLoading({
+          title: '加载中'
+        })
         this.$db.collection('shoppingCar').where({
           _id: row._id
         }).update({
@@ -220,6 +204,9 @@ export default {
     },
     addNums (row) {
       if (row.count <= 999) {
+        wx.showLoading({
+          title: '加载中'
+        })
         this.$db.collection('shoppingCar').where({
           _id: row._id
         }).update({

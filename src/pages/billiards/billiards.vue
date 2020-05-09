@@ -118,6 +118,9 @@ export default {
                 icon: 'none'
               })
             } else {
+              wx.showLoading({
+                title: '开台中'
+              })
               const startTime = `${year}-${month}-${day} ${hour}:${minutes}`
               console.log(startTime, 'st')
               wx.cloud.callFunction({
@@ -128,6 +131,7 @@ export default {
                   useName: Megalo.getStorageSync('nickName')
                 },
                 success: _ => {
+                  wx.hideLoading()
                   this.getData()
                 }
               })
