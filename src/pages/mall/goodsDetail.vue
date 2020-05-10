@@ -148,8 +148,7 @@ export default {
               price: this.dataList.price,
               count: this.goodsNum,
               url: this.dataList.url[0],
-              isChecked: false,
-              isClosed: false
+              isChecked: false
             },
             success: _ => {
               wx.showToast({
