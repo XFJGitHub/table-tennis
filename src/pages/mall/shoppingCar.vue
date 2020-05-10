@@ -92,6 +92,9 @@ export default {
     getData () {
       wx.cloud.callFunction({
         name: 'getShoppingCar',
+        data: {
+          openid: Megalo.getStorageSync('openid')
+        },
         success: res => {
           this.dataList = res.result.data
           let flag = 0 // 0全选

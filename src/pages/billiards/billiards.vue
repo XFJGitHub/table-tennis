@@ -171,6 +171,7 @@ export default {
           timeStamp: new Date(row.startTime.slice(5, 10)).getTime(),
           name: row.name,
           brand: row.brand,
+          nickName: row.useName,
           usingHours: tableHour,
           totalMoney: totalMoney
         }
