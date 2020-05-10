@@ -78,7 +78,8 @@ export default {
             adviceTitle: this.adviceTitle,
             adviceContent: this.adviceContent,
             linkPhone: this.linkPhone,
-            imgList: this.imgList
+            imgList: this.imgList,
+            nickName: Megalo.getStorageSync('nickName')
           },
           success: _ => {
             wx.showToast({
