@@ -72,25 +72,33 @@ export default {
       })
     },
     submit () {
-      this.$db.collection('adviceList').add({
-        data: {
-          adviceTitle: this.adviceTitle,
-          adviceContent: this.adviceContent,
-          linkPhone: this.linkPhone,
-          imgList: this.imgList
-        },
-        success: _ => {
-          wx.showToast({
-            title: '提交成功',
-            success: _ => {
-              this.adviceTitle = ''
-              this.adviceContent = ''
-              this.linkPhone = ''
-              this.imgList = []
-            }
-          })
-        }
-      })
+      if (this.adviceTitle && this.adviceContent && this.linkPhone) {
+        this.$db.collection('adviceList').add({
+          data: {
+            adviceTitle: this.adviceTitle,
+            adviceContent: this.adviceContent,
+            linkPhone: this.linkPhone,
+            imgList: this.imgList
+          },
+          success: _ => {
+            wx.showToast({
+              title: '提交成功',
+              success: _ => {
+                this.adviceTitle = ''
+                this.adviceContent = ''
+                this.linkPhone = ''
+                this.imgList = []
+              }
+            })
+          }
+        })
+      }
+      else {
+        wx.showToast({
+          title: '必填项不可为空',
+          icon: 'none'
+        })
+      }
     }
   }
 }
