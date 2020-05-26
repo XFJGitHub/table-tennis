@@ -67,6 +67,7 @@
 </template>
 
 <script>
+import { setBill } from '../../utils/aboutPay.js'
 export default {
   data () {
     return {
@@ -108,6 +109,7 @@ export default {
               balance: nowBalance - this.goods.price
             },
             success: _ => {
+              setBill(this.goods, 'goods', this.goods.price)
               wx.showToast({
                 title: '支付成功',
                 success: _ => {
@@ -119,7 +121,7 @@ export default {
                       orderType: 0
                     },
                     success: _ => {
-                      this.getData(this.goods._id)
+                      this.getData(this.goods)
                     }
                   })
                 }

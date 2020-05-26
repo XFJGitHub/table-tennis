@@ -276,7 +276,7 @@ export default {
                     sType: this.toHouse ? '送货上门' : '自提',
                     price: this.totalMoney,
                     url: this.dataList.url[0],
-                    time: `${year}-${month}-${day} ${hour}:${minutes}:${ss}`
+                    time: `${year}-${month < 10 ? '0' + month : month}-${day} ${hour}:${minutes}:${ss}`
                   }
                 })
                 wx.showToast({
