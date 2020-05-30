@@ -106,7 +106,6 @@ export default {
               ++flag
               if (this.init) {
                 this.checkGoods.push(e)
-                console.log(this.checkGoods)
               }
             }
           })

@@ -158,6 +158,8 @@ export default {
             this.stopBusinessStatus = res.data[0].isClosed
           }
         })
+      } else {
+        this.balance = 0.00
       }
     },
     // 获取用户信息

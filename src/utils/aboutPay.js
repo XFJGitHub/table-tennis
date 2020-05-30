@@ -26,9 +26,6 @@ export const setOrder = (goods, price) => {
             url: goods.url,
             time: `${year}-${month < 10 ? '0' + month : month}-${day} ${hour}:${minutes}:${ss}`
         },
-        success: _ => {
-            console.log('order suc')
-        },
         fail: err => {
             console.log(err, 123)
         }
@@ -45,11 +42,8 @@ export const setBill = (goods, type, price) => {
           url: goods.url,
           time: `${month}月${day}日 ${hour}:${minutes}:${ss}`
         },
-        success: res => {
-            console.log('bill suc')
-        },
         fail: err => {
-            console.log(err, 234)
+            console.log(err)
         }
     })
 }

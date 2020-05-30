@@ -141,15 +141,14 @@ export default {
       e.detail.value === '1' ? this.toHouse = 0 : this.toHouse = 1
     },
     chooseImg () {
-      let that = this
-      that.imgList = []
+      this.imgList = []
       wx.chooseImage({
         count: 5,
         sizeType: ['original', 'compressed'],
         sourceType: ['album', 'camera'],
-        success (res) {
+        success: res => {
           res.tempFiles.map(e => {
-            that.imgList.push(e.path)
+            this.imgList.push(e.path)
           })
         }
       })
@@ -160,7 +159,8 @@ export default {
           title: '提交中'
         })
         let promiseArr = []
-        for (let i = 0;i <this.imgList.length;i++) {
+        this.fileIDs = [] // 提交一次后置空
+        for (let i = 0;i < this.imgList.length;i++) {
           let filePath = this.imgList[i]
           let suffix = /\.[^\.]+$/.exec(filePath)[0]  // 文件后缀
           promiseArr.push(new Promise((reslove, reject) => {
