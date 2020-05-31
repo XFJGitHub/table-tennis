@@ -95,7 +95,7 @@ export default {
         }
       })
     },
-    setBill() {
+    setBill () {
       const date = new Date()
       const month = (date.getMonth() + 1)
       const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
