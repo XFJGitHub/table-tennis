@@ -58,12 +58,15 @@
 </template>
 
 <script>
+import { setOrder, setBill, updateBalance } from '../../utils/aboutPay.js'
 export default {
   data () {
     return {
+      init: true, // 控制第一次进入购物车选中数组
       isX: Megalo.getStorageSync('iphoneX'),
       checkAll: false,
       dataList: [],
+      checkGoods: [], //  存放选中的多商品
       totalCount: undefined,
       totalPrice: 0,
       pageNo: 0,
@@ -101,8 +104,12 @@ export default {
           this.dataList.map(e => {
             if (e.isChecked === true) {
               ++flag
+              if (this.init) {
+                this.checkGoods.push(e)
+              }
             }
           })
+          this.init = false
           if (flag === this.totalCount) {
             this.checkAll = true
           } else {
@@ -173,6 +180,28 @@ export default {
         },
         success: _ => {
           this.getData()
+          // 全选后单个取消选中 全选按钮状态改变 ***
+          let flag = 0 // 0全选
+          this.dataList.map(e => {
+            if (e.isChecked === false) {
+              return ++flag
+            }
+          })
+          if (flag !== this.dataList.length) {
+            this.checkAll = false
+          }
+          // ***
+          // 多个商品结算 ***
+          if (!row.isChecked) {
+            this.checkGoods.push(row)
+          } else {
+            for (let i = 0; i < this.checkGoods.length; i++) {
+              if (this.checkGoods[i].name === row.name) {
+                this.checkGoods.splice(i, 1)
+              }
+            }
+          }
+          // ***
         }
       })
       this.getTotalPrice()
@@ -224,19 +253,38 @@ export default {
         })
       }
     },
-    // 结算有问题 
-    settle (row) {
-      const _ = this.$db.command
+    settle () {
+      let nowBalance
       this.$db.collection('userInfo').where({
         _openid: Megalo.getStorageSync('openid')
-      }).update({
-        data: {
-          balance: _.inc(-this.totalPrice)
-        },
-        success: _ => {
-          wx.showToast({
-            title: '结算成功'
-          })
+      }).get({
+        success: res => {
+          nowBalance = res.data[0].balance
+          if (nowBalance >= this.totalPrice) {
+            for (let i = 0; i < this.checkGoods.length; i++) {
+              let price = this.checkGoods[i].price * this.checkGoods[i].count
+              setOrder(this.checkGoods[i], price)
+              setBill(this.checkGoods[i], 'goods', price)
+              this.$db.collection('shoppingCar').where({
+                _id: this.checkGoods[i]._id
+              }).remove()
+            }
+            updateBalance(-this.totalPrice)
+            wx.showToast({
+              title: '结算成功'
+            })
+            this.getData()
+          } else {
+            wx.showToast({
+              title: '很抱歉您的余额不足，请前往充值',
+              icon: 'none',
+              success: _ => {
+                wx.navigateTo({
+                  url: '/pages/my/recharge'
+                })
+              }
+            })
+          }
         }
       })
     }

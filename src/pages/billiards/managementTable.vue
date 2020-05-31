@@ -25,6 +25,7 @@
           <i @click="submitTable(item._id)" v-if="isEdit && tableId === item._id" class="icon_submit" />
           <i @click="editTable(item)" v-else class="icon_edit" />
           <i @click="deleteTable(item._id)" class="ml_20 icon_delete" />
+          <i @click="isEdit = false" v-if="isEdit && tableId === item._id" class="ml_20 icon_cancel_small" />
         </div>
       </div>
       <div @click="addTable" class="table-add">
@@ -51,7 +52,7 @@ export default {
     this.getData()
     wx.stopPullDownRefresh()
   },
-  onLoad () {
+  onShow () {
     this.getData()
   },
   methods: {

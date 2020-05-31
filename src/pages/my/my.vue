@@ -159,7 +159,7 @@ export default {
           }
         })
       } else {
-        this.balance = 0
+        this.balance = 0.00
       }
     },
     // 获取用户信息

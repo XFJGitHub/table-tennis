@@ -14,8 +14,8 @@
         <span>支付成功</span>
       </p>
       <p>
-        <span class="title-text">商品</span>
-        <span>{{dataList.name}}</span>
+        <span class="title-text">账单类别</span>
+        <span>{{billType}}</span>
       </p>
       <p>
         <span class="title-text">支付时间</span>
@@ -40,6 +40,15 @@ export default {
   data () {
     return {
       dataList: {}
+    }
+  },
+  computed: {
+    billType () {
+      switch (this.dataList._type) {
+        case 'goods': return '商品'
+        case 'billiard': return '台费'
+        case 'recharge': return '充值'
+      }
     }
   },
   onLoad (options) {

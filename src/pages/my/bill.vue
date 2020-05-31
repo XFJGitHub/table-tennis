@@ -93,6 +93,8 @@ export default {
     }
   },
   onPullDownRefresh () {
+    this.pageNo = 0
+    this.dataList = []
     this.getData()
     wx.stopPullDownRefresh()
   },

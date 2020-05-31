@@ -1,6 +1,6 @@
 <config>
   {
-    'navigationBarTitleText': '管理球桌',
+    'navigationBarTitleText': '管理商品',
     'enablePullDownRefresh': true
   }
 </config>

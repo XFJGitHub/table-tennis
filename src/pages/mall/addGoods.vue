@@ -20,16 +20,18 @@
         <span class="red_star">*</span>
         包邮
       </div>
-      <RadioGroup @click="radioChange">
+      <radio-group @change="radioChange">
         <radio
-        style="zoom:.8;margin:10rpx 20rpx 0 23rpx"
-        v-for="item in radioList"
-        :key="item.id"
-        :value="item.tags"
-        :checked="item.checked">
-          {{item.tags}}
+          style="zoom:.8;margin:10rpx 20rpx 0 23rpx"
+          class="mr_20"
+          v-for="(item, ind) in radioList"
+          :key="ind"
+          :value="item.id"
+          :checked="item.checked"
+        >
+          <text>{{item.tags}}</text>
         </radio>
-      </RadioGroup>
+      </radio-group>
     </div>
     <div class="border_bottom p_20" style="width: 100%">
       <!-- 商品类别 -->
@@ -136,18 +138,17 @@ export default {
       this.routerIndex = e.detail.value
     },
     radioChange (e) {
-      e.detail.value ? this.toHouse = 0 : this.toHouse = 1
+      e.detail.value === '1' ? this.toHouse = 0 : this.toHouse = 1
     },
     chooseImg () {
-      let that = this
-      that.imgList = []
+      this.imgList = []
       wx.chooseImage({
         count: 5,
         sizeType: ['original', 'compressed'],
         sourceType: ['album', 'camera'],
-        success (res) {
+        success: res => {
           res.tempFiles.map(e => {
-            that.imgList.push(e.path)
+            this.imgList.push(e.path)
           })
         }
       })
@@ -158,7 +159,8 @@ export default {
           title: '提交中'
         })
         let promiseArr = []
-        for (let i = 0;i <this.imgList.length;i++) {
+        this.fileIDs = [] // 提交一次后置空
+        for (let i = 0;i < this.imgList.length;i++) {
           let filePath = this.imgList[i]
           let suffix = /\.[^\.]+$/.exec(filePath)[0]  // 文件后缀
           promiseArr.push(new Promise((reslove, reject) => {

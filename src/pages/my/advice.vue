@@ -93,8 +93,7 @@ export default {
             })
           }
         })
-      }
-      else {
+      } else {
         wx.showToast({
           title: '必填项不可为空',
           icon: 'none'
