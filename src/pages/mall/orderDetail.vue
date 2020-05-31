@@ -95,58 +95,71 @@ export default {
         }
       })
     },
-    setBill () {
-      const date = new Date()
-      const month = (date.getMonth() + 1)
-      const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
-      const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
-      const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
-      const ss = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
-      this.$db.collection('billList').add({
-        data: {
-          name: this.goods.name,
-          isIncome: false,
-          _type: 'goods',
-          price: this.goods.price,
-          url: this.goods.url[0],
-          time: `${month}月${day}日 ${hour}:${minutes}:${ss}`
-        }
-      })
-    },
+    // setBill () {
+    //   const date = new Date()
+    //   const month = (date.getMonth() + 1)
+    //   const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
+    //   const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
+    //   const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+    //   const ss = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
+    //   this.$db.collection('billList').add({
+    //     data: {
+    //       name: this.goods.name,
+    //       isIncome: false,
+    //       _type: 'goods',
+    //       price: this.goods.price * this.goods.count,
+    //       url: this.goods.url[0],
+    //       time: `${month}月${day}日 ${hour}:${minutes}:${ss}`
+    //     }
+    //   })
+    // },
     pay () {
       let nowBalance
+      let totalPrice
+      totalPrice = this.goods.count * this.goods.price
       this.$db.collection('userInfo').where({
         _openid: Megalo.getStorageSync('openid')
       }).get({
         success: res => {
           nowBalance = res.data[0].balance
-          this.$db.collection('userInfo').where({
-            _openid: Megalo.getStorageSync('openid')
-          }).update({
-            data: {
-              balance: nowBalance - this.goods.price
-            },
-            success: _ => {
-              setBill(this.goods, 'goods', this.goods.price)
-              wx.showToast({
-                title: '支付成功',
-                success: _ => {
-                  this.setBill()
-                  this.$db.collection('orderList').where({
-                    _id: this.goods._id
-                  }).update({
-                    data: {
-                      orderStatus: '已完成',
-                      orderType: 0
-                    },
-                    success: _ => {
-                      this.getData(this.goods)
-                    }
-                  })
-                }
-              })
-            }
-          })
+          if (nowBalance >= totalPrice) {
+            this.$db.collection('userInfo').where({
+              _openid: Megalo.getStorageSync('openid')
+            }).update({
+              data: {
+                balance: nowBalance - this.goods.price
+              },
+              success: _ => {
+                setBill(this.goods, 'goods', this.goods.price)
+                wx.showToast({
+                  title: '支付成功',
+                  success: _ => {
+                    this.$db.collection('orderList').where({
+                      _id: this.goods._id
+                    }).update({
+                      data: {
+                        orderStatus: '已完成',
+                        orderType: 0
+                      },
+                      success: _ => {
+                        this.getData(this.goods)
+                      }
+                    })
+                  }
+                })
+              }
+            })
+          } else {
+            wx.showToast({
+              title: '很抱歉您的余额不足，请前往充值',
+              icon: 'none',
+              success: _ => {
+                wx.navigateTo({
+                  url: '/pages/my/recharge'
+                })
+              }
+            })
+          }
         }
       })
     }
