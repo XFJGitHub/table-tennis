@@ -140,20 +140,54 @@ export default {
             icon: 'none'
           })
         } else {
-          const time = new Date()
-          this.$db.collection('shoppingCar').add({
+          // 遍历下同名的就数量加上去
+          let goodsNameArray = []
+          wx.cloud.callFunction({
+            name: 'getShoppingCar',
             data: {
-              createdTime: time,
-              name: this.dataList.name,
-              price: this.dataList.price,
-              count: this.goodsNum,
-              url: this.dataList.url[0],
-              isChecked: false
+              openid: Megalo.getStorageSync('openid')
             },
-            success: _ => {
-              wx.showToast({
-                title: '加入购物车成功'
+            success: res => {
+              res.result.data.map(e => {
+                if (!~goodsNameArray.indexOf(e.name)) {
+                  goodsNameArray.push(e.name)
+                }
               })
+              if (goodsNameArray.includes(this.dataList.name)) {
+                this.$db.collection('shoppingCar').where({
+                  name: this.dataList.name
+                }).update({
+                  data: {
+                    count: this.$db.command.inc(this.goodsNum)
+                  },
+                  success: _ => {
+                    wx.showToast({
+                      title: '加入购物车成功'
+                    })
+                  }
+                })
+              } else {
+                const time = new Date()
+                this.$db.collection('shoppingCar').add({
+                  data: {
+                    createdTime: time,
+                    name: this.dataList.name,
+                    price: this.dataList.price,
+                    count: this.goodsNum,
+                    url: this.dataList.url[0],
+                    isChecked: false,
+                    sAddress: this.sAddress,
+                    sName: this.sName,
+                    sPhone: this.sPhone,
+                    sType: this.toHouse ? '送货上门' : '自提'
+                  },
+                  success: _ => {
+                    wx.showToast({
+                      title: '加入购物车成功'
+                    })
+                  }
+                })
+              }
             }
           })
         }

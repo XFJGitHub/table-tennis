@@ -8,14 +8,14 @@
   <div class="mg-table">
     <div style="border:1px solid #e5e5e5">
       <div class="table-head">
-        <div style="width:200rpx">球桌名</div>
+        <div style="width:200rpx">球桌编号</div>
         <div style="width:170rpx">球桌价格</div>
         <div style="width:160rpx">上/下架</div>
         <div style="width:200rpx">操作区</div>
       </div>
       <div class="flex align_center py_20" v-for="(item, ind) in tableList" :key="ind">
         <div class="flex">
-          <input type="text" placeholder="输入球桌名" style="width:200rpx" v-if="isEdit && tableId === item._id" v-model="tableName">
+          <input type="text" placeholder="输入球桌编号" style="width:200rpx" v-if="isEdit && tableId === item._id" v-model="tableName">
           <div v-else style="width:200rpx" class="text-ellipsis">{{item.name}}</div>
           <input type="text" placeholder="输入价格" style="width:170rpx" v-if="isEdit && tableId === item._id" v-model="tablePrice">
           <div v-else style="width:170rpx">{{item.price}}</div>
@@ -110,7 +110,7 @@ export default {
         })
       } else {
         wx.showToast({
-          title: '请检查球桌名和价格是否都填写',
+          title: '请检查球桌编号和价格是否都填写',
           icon: 'none'
         })
       }

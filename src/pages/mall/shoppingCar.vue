@@ -46,7 +46,7 @@
         </div>
         <div class="flex align_center fontsize_26">
           合计:<span class="color_ff4">￥{{totalPrice}}</span>
-          <div class="ml_10 t-button t-button-primary">结算</div>
+          <div @click="settle()" class="ml_10 t-button t-button-primary">结算</div>
         </div>
       </div>
     </div>
@@ -105,6 +105,8 @@ export default {
           })
           if (flag === this.totalCount) {
             this.checkAll = true
+          } else {
+            this.checkAll = false
           }
           this.getTotalPrice()
           wx.hideLoading()
@@ -221,6 +223,22 @@ export default {
           }
         })
       }
+    },
+    // 结算有问题 
+    settle (row) {
+      const _ = this.$db.command
+      this.$db.collection('userInfo').where({
+        _openid: Megalo.getStorageSync('openid')
+      }).update({
+        data: {
+          balance: _.inc(-this.totalPrice)
+        },
+        success: _ => {
+          wx.showToast({
+            title: '结算成功'
+          })
+        }
+      })
     }
   }
 }

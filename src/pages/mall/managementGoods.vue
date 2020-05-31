@@ -22,9 +22,9 @@
           <switch style="width:180rpx;zoom:.7" :checked="item.recommend" @change="changeStatus(item)"/>
         </div>
         <div class="flex ml_20">
-          <i @click="submitTable(item._id)" v-if="isEdit && goodsId === item._id" class="icon_submit" />
-          <i @click="editTable(item)" v-else class="icon_edit" />
-          <i @click="deleteTable(item._id)" class="ml_20 icon_delete" />
+          <i @click="submitGoods(item._id)" v-if="isEdit && goodsId === item._id" class="icon_submit" />
+          <i @click="editeGoods(item)" v-else class="icon_edit" />
+          <i @click="deleteGoods(item._id)" class="ml_20 icon_delete" />
         </div>
       </div>
       <div @click="addGoods" class="table-add">
@@ -77,11 +77,11 @@ export default {
         }
       })
     },
-    editTable (row) {
+    editeGoods (row) {
       this.isEdit = true
       this.goodsId = row._id
     },
-    deleteTable (id) {
+    deleteGoods (id) {
       wx.cloud.callFunction({
         name: 'deleteGoods',
         data: {
@@ -111,7 +111,7 @@ export default {
       //   }
       // })
     },
-    submitTable (id) {
+    submitGoods (id) {
       if (this.goodsName && this.goodsPrice) {
         this.$db.collection('goods').where({
           _id: id

@@ -94,6 +94,24 @@ export default {
         }
       })
     },
+    setBill() {
+      const date = new Date()
+      const month = (date.getMonth() + 1)
+      const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
+      const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
+      const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+      const ss = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
+      this.$db.collection('billList').add({
+        data: {
+          name: this.goods.name,
+          isIncome: false,
+          _type: 'goods',
+          price: this.goods.price,
+          url: this.goods.url[0],
+          time: `${month}月${day}日 ${hour}:${minutes}:${ss}`
+        }
+      })
+    },
     pay () {
       let nowBalance
       this.$db.collection('userInfo').where({
@@ -111,6 +129,7 @@ export default {
               wx.showToast({
                 title: '支付成功',
                 success: _ => {
+                  this.setBill()
                   this.$db.collection('orderList').where({
                     _id: this.goods._id
                   }).update({
@@ -119,7 +138,9 @@ export default {
                       orderType: 0
                     },
                     success: _ => {
-                      this.getData(this.goods._id)
+                      wx.navigateTo({
+                        url: '/pages/mall/orderList'
+                      })
                     }
                   })
                 }

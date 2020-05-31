@@ -10,7 +10,7 @@
       <input maxlength="7" type="number" v-model="rechargeNum" placeholder="请输入充值金额">
     </div>
     <div @click="recharge" class="m_20 t-button t-button-primary">充值</div>
-    <div class="color_156 fontsize_26 p_20">温馨提示:只能充值小于一百万~</div>
+    <div class="color_156 fontsize_26 p_20">温馨提示:只能充值小于一千万~</div>
   </div>
 </template>
 
@@ -43,43 +43,50 @@ export default {
           }
         })
       } else {
-        this.$db.collection('userInfo').where({
-          _openid: Megalo.getStorageSync('openid')
-        }).get({
-          success: res => {
-            nowBalance = res.data[0].balance
-            this.$db.collection('userInfo').where({
-              _openid: Megalo.getStorageSync('openid')
-            }).update({
-              data: {
-                balance: nowBalance + Number(this.rechargeNum)
-              },
-              success: _ => {
-                this.$db.collection('billList').add({
-                  data: {
-                    name: `充值余额`,
-                    isIncome: true,
-                    _type: 'recharge',
-                    price: this.rechargeNum,
-                    url: 'https://static.dingdandao.com/da4beb15dab1194cc20efefb6ba0d2fe',
-                    time: `${month}月${day}日 ${hour}:${minutes}`
-                  }
-                })
-                wx.showToast({
-                  title: '充值成功',
-                  duration: 3000,
-                  success: _ => {
-                    setTimeout(_ => {
-                      wx.switchTab({
-                        url: '/pages/my/my'
-                      })
-                    }, 2000)
-                  }
-                })
-              }
-            })
-          }
-        })
+        if (this.rechargeNum <= 0) {
+          wx.showToast({
+            title: '充值金额不能为负数',
+            icon: 'none'
+          })
+        } else {
+          this.$db.collection('userInfo').where({
+            _openid: Megalo.getStorageSync('openid')
+          }).get({
+            success: res => {
+              nowBalance = res.data[0].balance
+              this.$db.collection('userInfo').where({
+                _openid: Megalo.getStorageSync('openid')
+              }).update({
+                data: {
+                  balance: nowBalance + Number(this.rechargeNum)
+                },
+                success: _ => {
+                  this.$db.collection('billList').add({
+                    data: {
+                      name: `充值余额`,
+                      isIncome: true,
+                      _type: 'recharge',
+                      price: this.rechargeNum,
+                      url: 'https://static.dingdandao.com/da4beb15dab1194cc20efefb6ba0d2fe',
+                      time: `${month}月${day}日 ${hour}:${minutes}`
+                    }
+                  })
+                  wx.showToast({
+                    title: '充值成功',
+                    duration: 3000,
+                    success: _ => {
+                      setTimeout(_ => {
+                        wx.switchTab({
+                          url: '/pages/my/my'
+                        })
+                      }, 2000)
+                    }
+                  })
+                }
+              })
+            }
+          })
+        }
       }
     }
   }
